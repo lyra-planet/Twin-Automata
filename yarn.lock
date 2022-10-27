@@ -10,6 +10,11 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
+"@antfu/utils@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.npmmirror.com/@antfu/utils/-/utils-0.5.2.tgz#8c2d931ff927be0ebe740169874a3d4004ab414b"
+  integrity sha512-CQkeV+oJxUazwjlHD0/3ZD08QWKuGQkhnrKo3e6ly5pd48VUpXbb77q0xMU4+vc2CkJnDS02Eq/M9ugyX20XZA==
+
 "@babel/code-frame@7.12.11":
   version "7.12.11"
   resolved "https://registry.npmmirror.com/@babel/code-frame/-/code-frame-7.12.11.tgz#f4ad435aa263db935b8f10f2c552d23fb716a63f"
@@ -1054,6 +1059,11 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@julr/unocss-preset-heropatterns@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.npmmirror.com/@julr/unocss-preset-heropatterns/-/unocss-preset-heropatterns-0.0.2.tgz#a321a61881f7ef699553fd89718a1560d3580254"
+  integrity sha512-TuGp47h0NJ4C0yhySMEQl06QyF2922arBes2zaAxnh2s+efkeW0glHwkvGE/Cc4JAY+51k8QL8FktyeIpl7erw==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmmirror.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -1386,6 +1396,28 @@
   version "3.2.39"
   resolved "https://registry.npmmirror.com/@vue/shared/-/shared-3.2.39.tgz#302df167559a1a5156da162d8cc6760cef67f8e3"
   integrity sha512-D3dl2ZB9qE6mTuWPk9RlhDeP1dgNRUKC3NJxji74A4yL8M2MwlhLKUC/49WHjrNzSPug58fWx/yFbaTzGAQSBw==
+
+"@windicss/config@1.8.8":
+  version "1.8.8"
+  resolved "https://registry.npmmirror.com/@windicss/config/-/config-1.8.8.tgz#296ede5ac54179c6e86c5b2746fa50de78e8eb65"
+  integrity sha512-kNas/zMkwsDFMcJPmHoPDJlQi1MHvYwx8BSxo9JKcbCW7Gaj8Rg2CnEImX5YdT+ZcFQqQ+kUn0Vi/ScsAxhGEw==
+  dependencies:
+    debug "^4.3.4"
+    jiti "^1.14.0"
+    windicss "^3.5.6"
+
+"@windicss/plugin-utils@1.8.8":
+  version "1.8.8"
+  resolved "https://registry.npmmirror.com/@windicss/plugin-utils/-/plugin-utils-1.8.8.tgz#4764e68a39a09189f1b46047ab0057eac7c91c0d"
+  integrity sha512-a+npbTKmdrAvnMqzVJvyPa29xyNcPaSkt6qQpgWY9m0WyVlYd9BM8V0+cbqt279fTlvlaZpUs9dqmilB1PUH6g==
+  dependencies:
+    "@antfu/utils" "^0.5.2"
+    "@windicss/config" "1.8.8"
+    debug "^4.3.4"
+    fast-glob "^3.2.11"
+    magic-string "^0.26.2"
+    micromatch "^4.0.5"
+    windicss "^3.5.6"
 
 acorn-jsx@^5.3.1:
   version "5.3.2"
@@ -1803,7 +1835,7 @@ debug@^2.2.0, debug@^2.3.3:
   dependencies:
     ms "2.0.0"
 
-debug@^4.0.1, debug@^4.1.0, debug@^4.1.1:
+debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@^4.3.4:
   version "4.3.4"
   resolved "https://registry.npmmirror.com/debug/-/debug-4.3.4.tgz#1319f6579357f2338d3337d2cdd4914bb5dcc865"
   integrity sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==
@@ -2633,6 +2665,11 @@ jest-worker@^24.0.0:
     merge-stream "^2.0.0"
     supports-color "^6.1.0"
 
+jiti@^1.14.0:
+  version "1.16.0"
+  resolved "https://registry.npmmirror.com/jiti/-/jiti-1.16.0.tgz#f72065954446ad1866fa8d6bcc3bed3cc1cebdaa"
+  integrity sha512-L3BJStEf5NAqNuzrpfbN71dp43mYIcBUlCRea/vdyv5dW/AYa1d4bpelko4SHdY3I6eN9Wzyasxirj1/vv5kmg==
+
 js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmmirror.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
@@ -2761,6 +2798,11 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   resolved "https://registry.npmmirror.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
+kolorist@^1.5.1:
+  version "1.6.0"
+  resolved "https://registry.npmmirror.com/kolorist/-/kolorist-1.6.0.tgz#f43ac794305b30032a5bedcae7799d0f91d2ff36"
+  integrity sha512-dLkz37Ab97HWMx9KTes3Tbi3D1ln9fCAy2zr2YVExJasDRPGRaKcoE4fycWNtnCAJfjFqe0cnY+f8KT2JePEXQ==
+
 levn@^0.4.1:
   version "0.4.1"
   resolved "https://registry.npmmirror.com/levn/-/levn-0.4.1.tgz#ae4562c007473b932a6200d403268dd2fffc6ade"
@@ -2822,6 +2864,13 @@ magic-string@^0.25.7:
   dependencies:
     sourcemap-codec "^1.4.8"
 
+magic-string@^0.26.2:
+  version "0.26.7"
+  resolved "https://registry.npmmirror.com/magic-string/-/magic-string-0.26.7.tgz#caf7daf61b34e9982f8228c4527474dac8981d6f"
+  integrity sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==
+  dependencies:
+    sourcemap-codec "^1.4.8"
+
 make-dir@^2.0.0, make-dir@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmmirror.com/make-dir/-/make-dir-2.1.0.tgz#5f0310e18b8be898cc07009295a30ae41e91e6f5"
@@ -2871,7 +2920,7 @@ micromatch@^3.1.10:
     snapdragon "^0.8.1"
     to-regex "^3.0.2"
 
-micromatch@^4.0.4:
+micromatch@^4.0.4, micromatch@^4.0.5:
   version "4.0.5"
   resolved "https://registry.npmmirror.com/micromatch/-/micromatch-4.0.5.tgz#bc8999a7cbbf77cdc89f132f6e467051b49090c6"
   integrity sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==
@@ -3849,6 +3898,16 @@ v8-compile-cache@^2.0.3:
   resolved "https://registry.npmmirror.com/v8-compile-cache/-/v8-compile-cache-2.3.0.tgz#2de19618c66dc247dcfb6f99338035d8245a2cee"
   integrity sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==
 
+vite-plugin-windicss@^1.8.8:
+  version "1.8.8"
+  resolved "https://registry.npmmirror.com/vite-plugin-windicss/-/vite-plugin-windicss-1.8.8.tgz#ff1adf7d1a1c38634c77a4c0125fa730d16138e7"
+  integrity sha512-iyu+ZX0NmhNEUaLPv7xtC+EFRBpWMmw0nhd9a9upayfuNG/thwslKiQKmRB7U/dG0k/2oWLvPDvN/B9i7oRgSA==
+  dependencies:
+    "@windicss/plugin-utils" "1.8.8"
+    debug "^4.3.4"
+    kolorist "^1.5.1"
+    windicss "^3.5.6"
+
 vite@^3.1.0:
   version "3.1.3"
   resolved "https://registry.npmmirror.com/vite/-/vite-3.1.3.tgz#b2a0821c11aae124bb7618f8036913c689afcc59"
@@ -3883,6 +3942,11 @@ which@^2.0.1:
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
+
+windicss@^3.5.6:
+  version "3.5.6"
+  resolved "https://registry.npmmirror.com/windicss/-/windicss-3.5.6.tgz#30a34da76894d952a96c9a1921f2e91e13932183"
+  integrity sha512-P1mzPEjgFMZLX0ZqfFht4fhV/FX8DTG7ERG1fBLiWvd34pTLVReS5CVsewKn9PApSgXnVfPWwvq+qUsRwpnwFA==
 
 word-wrap@^1.2.3:
   version "1.2.3"

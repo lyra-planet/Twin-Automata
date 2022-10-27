@@ -1,12 +1,11 @@
 import * as PIXI from "pixi.js";
 import { keyboard } from "./control/keyboard";
 import { adventurerObject } from "./Player/PlayerObject";
-import {BlockLists,TrapBlockLists} from './blockLists/blockLists'
-import {BlockObjectLists,TrapBlockObjectLists} from "./ObjectLists/StaticObjectLists";
+import { BlockLists, TrapBlockLists, MoveBlockLists } from './blockLists/blockLists';
+import {BlockObjectLists,MoveBlockObjectLists,TrapBlockObjectLists} from "./ObjectLists/StaticObjectLists";
 import { PlayerMovement } from "./action/gameObjectMovements";
 import {allPicture} from "./static/gamePictures";
 import {GroundPosition} from"./static/blocksSize"
-import { log } from "console";
 let isLeftDown = false,
     isRightDown = false,
     isSpaceDown = false,
@@ -31,8 +30,7 @@ export const initPIXI = () => {
 }
   app.stage.addChild(scenario)
   app.renderer.backgroundColor = 0x23395d;
-  document.body.appendChild(app.view);
-  console.log(PIXI.utils.TextureCache)
+  document.getElementById("game")?.appendChild(app.view);
   loader
     .add(allPicture)
     .load(setup)
@@ -40,9 +38,11 @@ export const initPIXI = () => {
     //玩家属性初始化
     
     let trapBlockLists = new TrapBlockObjectLists(TrapBlockLists,scenario)
-    let blockObjectLists =  new BlockObjectLists(BlockLists,scenario)
-    blockObjectLists.init()
+    let blockLists =  new BlockObjectLists(BlockLists,scenario)
+    let moveBlockLists =  new MoveBlockObjectLists(MoveBlockLists,scenario)
+    blockLists.init()
     trapBlockLists.init()
+    moveBlockLists.init()
     let adventurer = adventurerObject.init();
     scenario.addChild(adventurer);
     app.renderer.render(app.stage);
@@ -76,7 +76,6 @@ export const initPIXI = () => {
         isShiftDown= false
       }
     }
-    setInterval(()=>{console.log(tick);tick=0},1000)
     let fps = 60,
         lastFrameTimeMs = 0,
         timestep = 1000 / 144,
@@ -87,7 +86,7 @@ export const initPIXI = () => {
       delta += timestamp - lastFrameTimeMs;
       lastFrameTimeMs = timestamp;
       while (delta >= 1000/fps) {
-        update(timestep);
+        update();
         delta -= timestep;
       }
       if (timestamp > lastFpsUpdate + 1000) { 
@@ -99,7 +98,7 @@ export const initPIXI = () => {
     framesThisSecond++;
       requestAnimationFrame(gameLoop);
     } 
-    const update =(delta)=>{
+    const update =()=>{
       tick += 1
       let state =  PlayerMovement({
         playerObject:adventurerObject,
@@ -109,29 +108,55 @@ export const initPIXI = () => {
         isShiftDown:isShiftDown
       });
       {
-        blockObjectLists.update(tick)
-        blockObjectLists.updateCollisionBox_Block(
+        blockLists.update(tick)
+        blockLists.updateCollisionBox_Block(
           adventurerObject,
           isLeftDown,
           isRightDown,
           isSpaceDown) 
+          moveBlockLists.update(tick)
+          moveBlockLists.updateCollisionBox_Block(
+            adventurerObject,
+            isLeftDown,
+            isRightDown,
+            isSpaceDown) 
           trapBlockLists.update(tick)
-           trapBlockLists.updateCollisionBox_TrapBlock(
+          trapBlockLists.updateCollisionBox_TrapBlock(
           adventurerObject
         )
-      }  
-      adventurerObject.updateMovement(tick,state,blockObjectLists.collisionState)
+      } 
+      const allCollisionState = [blockLists.collisionState,moveBlockLists.collisionState] 
+      let finallCollisionState ={
+        hitFace:{x:{left:0,right:0},y:{top:0,bottom:0}},
+        stickFace:{left:0,right:0},
+        wallJump:{left:0,right:0},
+        shouldSpeed:{x:0,y:0}
+      }
+      allCollisionState.map(item=>{
+        finallCollisionState.hitFace.x.left+=item.hitFace.x.left
+        finallCollisionState.hitFace.x.right+=item.hitFace.x.right
+        finallCollisionState.hitFace.y.top+=item.hitFace.y.top
+        finallCollisionState.hitFace.y.bottom+=item.hitFace.y.bottom
+        finallCollisionState.stickFace.left+=item.stickFace.left
+        finallCollisionState.stickFace.right+=item.stickFace.right
+        finallCollisionState.wallJump.left+=item.wallJump.left
+        finallCollisionState.wallJump.right+=item.wallJump.right
+        finallCollisionState.shouldSpeed.x+=item.shouldSpeed.x
+        finallCollisionState.shouldSpeed.y+=item.shouldSpeed.y
+      })
+      adventurerObject.updateMovement(tick,state,finallCollisionState)
       relativePosition = adventurerObject.updateRelativePosition()
       scenario.x=-(relativePosition.x-GroundPosition.x/2)
       scenario.y=-(relativePosition.y-GroundPosition.y/2-100)
       isSpaceDown = false
     }
-    function draw(fps) {
-      var fpsDisplay = document.getElementById('fpsDisplay');
-      fpsDisplay.textContent = Math.round(fps) + ' FPS'; // 展示 FPS
+    function draw(fps: number) {
+      let fpsDisplay = document.querySelector('#fpsDisplay');
+      if(fpsDisplay){
+        fpsDisplay.textContent = Math.round(fps) + ' FPS'; 
+      }
     }
     requestAnimationFrame(gameLoop)
-    // app.ticker.add((delta) => gameLoop(delta))
   }
 }
 

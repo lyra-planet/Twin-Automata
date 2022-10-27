@@ -9,8 +9,6 @@ interface PlayerMovementData{
  isSpaceDown:boolean;
  isShiftDown:boolean;
 }
-
-let isLeftDown=false,isRightDown=false,isSpaceDown=false
 let sprint = false
 export const PlayerMovement = ({
   playerObject,

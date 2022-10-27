@@ -26,6 +26,23 @@ export const _42X84_BlockPicture = _42X84_BLOCK
 export const _42X21_BlockPicture = _42X21_BLOCK
 export const _21X42_BlockPicture = _21X42_BLOCK
 export const _21X21_BlockPicture = _21X21_BLOCK
+
+import _84X84_MOVE_BLOCK from '../../assets/moveBlock/_84X84_.jpg'
+import _84X42_MOVE_BLOCK from '../../assets/moveBlock/_84X42_.jpg'
+import _42X84_MOVE_BLOCK from '../../assets/moveBlock/_42X84_.jpg'
+import _42X42_MOVE_BLOCK from '../../assets/moveBlock/_42X42_.jpg'
+import _42X21_MOVE_BLOCK from '../../assets/moveBlock/_42X21_.jpg'
+import _21X42_MOVE_BLOCK from '../../assets/moveBlock/_21X42_.jpg'
+import _21X21_MOVE_BLOCK from '../../assets/moveBlock/_21X21_.jpg'
+export const _84X84_MoveBlockPicture = _84X84_MOVE_BLOCK
+export const _42X42_MoveBlockPicture = _42X42_MOVE_BLOCK
+export const _84X42_MoveBlockPicture = _84X42_MOVE_BLOCK
+export const _42X84_MoveBlockPicture = _42X84_MOVE_BLOCK
+export const _42X21_MoveBlockPicture = _42X21_MOVE_BLOCK
+export const _21X42_MoveBlockPicture = _21X42_MOVE_BLOCK
+export const _21X21_MoveBlockPicture = _21X21_MOVE_BLOCK
+
+
 //陷阱方块贴图
 import _84X84_TRAP from '../../assets/trap/_84X84_.jpg'
 import _84X42_TRAP from '../../assets/trap/_84X42_.jpg'
@@ -57,7 +74,14 @@ export const allPicture = [
     _42X84_TrapBlockPicture,
     _42X21_TrapBlockPicture,
     _21X42_TrapBlockPicture,
-    _21X21_TrapBlockPicture
+    _21X21_TrapBlockPicture,
+    _84X84_MoveBlockPicture,
+_42X42_MoveBlockPicture,
+_84X42_MoveBlockPicture,
+_42X84_MoveBlockPicture,
+_42X21_MoveBlockPicture,
+_21X42_MoveBlockPicture,
+_21X21_MoveBlockPicture,
 ]
 //角色动画
 export const adventurerFrames = {
@@ -116,6 +140,42 @@ export const _21X42_BlockFrames = {
     ]
 }
 export const _21X21_BlockFrames = {
+    static:[
+        [0,0,_21X21_BlockSize.width,_21X21_BlockSize.height]
+    ]
+}
+
+export const _84X84_MoveBlockFrames = {
+    static:[
+        [0,0,_84X84_BlockSize.width,_84X84_BlockSize.height]
+    ]
+}
+export const _42X84_MoveBlockFrames = {
+    static:[
+        [0,0,_42X84_BlockSize.width,_42X84_BlockSize.height]
+    ]
+}
+export const _84X42_MoveBlockFrames = {
+    static:[
+        [0,0,_84X42_BlockSize.width,_84X42_BlockSize.height]
+    ]
+}
+export const _42X42_MoveBlockFrames = {
+    static:[
+        [0,0,_42X42_BlockSize.width,_42X42_BlockSize.height]
+    ]
+}
+export const _42X21_MoveBlockFrames = {
+    static:[
+        [0,0,_42X21_BlockSize.width,_42X21_BlockSize.height]
+    ]
+}
+export const _21X42_MoveBlockFrames = {
+    static:[
+        [0,0,_21X42_BlockSize.width,_21X42_BlockSize.height]
+    ]
+}
+export const _21X21_MoveBlockFrames = {
     static:[
         [0,0,_21X21_BlockSize.width,_21X21_BlockSize.height]
     ]

@@ -6,18 +6,17 @@ interface NewtonLawsOfMotionData{
   direction: number;
   stop: number;
   groundPosition: number;
-
+  hitFace: { x: { left: number; right: number; }; y: { top: number; bottom: number; }; };
 }
 
 
 
 export const NewtonLawsOfMotion = (
   {
-    position,speed,fa, direction, stop, groundPosition
+    position,speed,fa, direction, stop, groundPosition,hitFace
   }:NewtonLawsOfMotionData
   
   ) => {
-  const round = Math.round
     let g=0.2
   if (stop) {
     if (direction > 0) {
@@ -34,9 +33,9 @@ export const NewtonLawsOfMotion = (
       }
     }
   }
-  if(position.y+speed.y<=groundPosition){
+  if(!hitFace.y.bottom){
     speed.y +=g / 2;
   }else{
-    speed.y = 0;
+    speed.y=0
   }
 };
