@@ -98,6 +98,13 @@ export const initPIXI = () => {
     framesThisSecond++;
       requestAnimationFrame(gameLoop);
     } 
+    let finallCollisionState ={
+      hitFace:{x:{left:0,right:0},y:{top:0,bottom:0}},
+      stickFace:{left:0,right:0},
+      wallJump:{left:0,right:0},
+      shouldSpeed:{x:0,y:0},
+      cross: {directionX:0,directionY:0}
+    }
     const update =()=>{
       tick += 1
       let state =  PlayerMovement({
@@ -108,47 +115,55 @@ export const initPIXI = () => {
         isShiftDown:isShiftDown
       });
       {
+        finallCollisionState ={
+          hitFace:{x:{left:0,right:0},y:{top:0,bottom:0}},
+          stickFace:{left:0,right:0},
+          wallJump:{left:0,right:0},
+          shouldSpeed:{x:0,y:0},
+          cross: {directionX:0,directionY:0}
+        }
+        moveBlockLists.update(tick)
         blockLists.update(tick)
+        trapBlockLists.update(tick)
+
         blockLists.updateCollisionBox_Block(
           adventurerObject,
           isLeftDown,
           isRightDown,
-          isSpaceDown) 
-          moveBlockLists.update(tick)
-          moveBlockLists.updateCollisionBox_Block(
-            adventurerObject,
+          isSpaceDown)         
+        moveBlockLists.updateCollisionBox_Block(
+          adventurerObject,
             isLeftDown,
             isRightDown,
             isSpaceDown) 
-          trapBlockLists.update(tick)
-          trapBlockLists.updateCollisionBox_TrapBlock(
+        trapBlockLists.updateCollisionBox_TrapBlock(
           adventurerObject
         )
-      } 
       const allCollisionState = [blockLists.collisionState,moveBlockLists.collisionState] 
-      let finallCollisionState ={
-        hitFace:{x:{left:0,right:0},y:{top:0,bottom:0}},
-        stickFace:{left:0,right:0},
-        wallJump:{left:0,right:0},
-        shouldSpeed:{x:0,y:0}
+        allCollisionState.map(item=>{
+          finallCollisionState.hitFace.x.left+=item.hitFace.x.left
+          finallCollisionState.hitFace.x.right+=item.hitFace.x.right
+          finallCollisionState.hitFace.y.top+=item.hitFace.y.top
+          finallCollisionState.hitFace.y.bottom+=item.hitFace.y.bottom
+          finallCollisionState.stickFace.left+=item.stickFace.left
+          finallCollisionState.stickFace.right+=item.stickFace.right
+          finallCollisionState.wallJump.left+=item.wallJump.left
+          finallCollisionState.wallJump.right+=item.wallJump.right
+          finallCollisionState.shouldSpeed.x+=item.shouldSpeed.x
+          finallCollisionState.shouldSpeed.y+=item.shouldSpeed.y
+          finallCollisionState.cross.directionX+=item.cross.directionX
+          finallCollisionState.cross.directionY+=item.cross.directionY
+        })  
+        adventurerObject.updateMovement(tick,state,finallCollisionState)
+        adventurerObject.updateCross(finallCollisionState.cross,finallCollisionState.shouldSpeed)
+        } 
+      {
+        relativePosition = adventurerObject.updateRelativePosition()
+        scenario.x=-(relativePosition.x-GroundPosition.x/2)
+        scenario.y=-(relativePosition.y-GroundPosition.y/2-100)
+        isSpaceDown = false
       }
-      allCollisionState.map(item=>{
-        finallCollisionState.hitFace.x.left+=item.hitFace.x.left
-        finallCollisionState.hitFace.x.right+=item.hitFace.x.right
-        finallCollisionState.hitFace.y.top+=item.hitFace.y.top
-        finallCollisionState.hitFace.y.bottom+=item.hitFace.y.bottom
-        finallCollisionState.stickFace.left+=item.stickFace.left
-        finallCollisionState.stickFace.right+=item.stickFace.right
-        finallCollisionState.wallJump.left+=item.wallJump.left
-        finallCollisionState.wallJump.right+=item.wallJump.right
-        finallCollisionState.shouldSpeed.x+=item.shouldSpeed.x
-        finallCollisionState.shouldSpeed.y+=item.shouldSpeed.y
-      })
-      adventurerObject.updateMovement(tick,state,finallCollisionState)
-      relativePosition = adventurerObject.updateRelativePosition()
-      scenario.x=-(relativePosition.x-GroundPosition.x/2)
-      scenario.y=-(relativePosition.y-GroundPosition.y/2-100)
-      isSpaceDown = false
+
     }
     function draw(fps: number) {
       let fpsDisplay = document.querySelector('#fpsDisplay');

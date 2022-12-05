@@ -3,6 +3,7 @@ import { Sprite } from "pixi.js";
 import { characterAnimation } from "../action/characterAnimation";
 import { NewtonLawsOfMotion } from "../action/Newton";
 import { GroundPosition } from "../static/blocksSize";
+import { adventurerObject } from "../Player/PlayerObject";
 import {
   blockTraceMovementObj,
   T_BlockMoveMentTrace,
@@ -43,6 +44,7 @@ export interface CollisionState {
   };
   stickFace: { left: number; right: number };
   wallJump: { left: number; right: number };
+  cross: {directionX:number,directionY:number}; 
 }
 export class Block {
   position: { x: number; y: number; width: number; height: number };
@@ -109,6 +111,7 @@ export class Block {
       stickFace: { left: 0, right: 0 },
       wallJump: { left: 0, right: 0 },
       shouldSpeed: { x: 0, y: 0 },
+      cross: {directionX:0,directionY:0}
     };
     this.gameObject = new Sprite(this.gameTexture);
     this.gameObject.anchor.y = 1;
@@ -152,6 +155,7 @@ export class Block {
 
 export class MoveBlock extends Block {
   objectMovement: blockTraceMovementObj;
+  standOnSelf: boolean;
   constructor({
     imageSrc,
     gameObjectFrame,
@@ -185,6 +189,7 @@ export class MoveBlock extends Block {
       this.gameObject,
       blockTrace
     );
+    this.standOnSelf = false
   }
   updateMovement(tick: number) {
     this.objectMovement?.blockTraceMovement(
@@ -192,8 +197,14 @@ export class MoveBlock extends Block {
       { x: this.gameObject.x, y: this.gameObject.y },
       tick
     );
+    if(this.standOnSelf){
+      adventurerObject.position.y+=this.speed.y
+      adventurerObject.position.x+=this.speed.x
+      this.standOnSelf=false
+    }
     super.update(tick);
   }
+
   updateRelativePosition() {
     return this.position;
   }
@@ -203,6 +214,16 @@ export interface PlayerInitializationData extends BlockInitializationData {
   groundPosition: number;
 }
 export class Player extends Block {
+  hitFace: {
+    x: {
+        left: number;
+        right: number;
+    };
+    y: {
+        top: number;
+        bottom: number;
+    };
+}
   constructor({
     imageSrc,
     gameObjectFrame,
@@ -234,6 +255,16 @@ export class Player extends Block {
       y: 2,
     };
     this.wallJumpStart = false;
+    this.hitFace={
+      x: {
+          left: 0,
+          right: 0,
+      },
+      y: {
+          top: 0,
+          bottom: 0,
+      }
+  }
   }
   updateMovement(tick: number, state: string, collisionState: CollisionState) {
     this.state = state;
@@ -244,7 +275,7 @@ export class Player extends Block {
     let stickFace = collisionState.stickFace;
     let wallJump = collisionState.wallJump;
     let shouldSpeed = collisionState.shouldSpeed;
-
+    this.hitFace = hitFace
     NewtonLawsOfMotion({
       position: this.position,
       speed: this.speed,
@@ -253,6 +284,7 @@ export class Player extends Block {
       stop: this.stop,
       groundPosition: this.groundPosition,
       hitFace: hitFace,
+      shouldSpeed:shouldSpeed
     });
     if ((stickFace.left || stickFace.right) && !hitFace.y.bottom) {
       if (wallJump.left) {
@@ -275,46 +307,48 @@ export class Player extends Block {
       }
     }
     if (hitFace) {   
-        if (hitFace.x.left) {
-          if (this.speed.x < 0) {
-            this.speed.x = 0;
-          }
+      if (hitFace.x.left) {
+        if (this.speed.x < 0) {
+          this.speed.x = 0;
         }
-        if (hitFace.x.right) {
-          if (this.speed.x > 0) {
-            this.speed.x = 0;
-          }
+      }
+      if (hitFace.x.right) {
+        if (this.speed.x > 0) {
+          this.speed.x = 0;
         }
-        if (hitFace.y.bottom && !(this.speed.y < 0)) {
-          this.speed.y = 0;
-        }
-        if (hitFace.y.top && !(this.speed.y > 0)) {
-          this.speed.y = 0;
-        }
-        if (hitFace.x.left && shouldSpeed.x > 0) {
-          this.position.x += shouldSpeed.x;
-        }
-        if (hitFace.x.right && shouldSpeed.x < 0) {
-          this.position.x += shouldSpeed.x;
-        }
-        if(hitFace.y.bottom){
-          if(!hitFace.x.left&&!hitFace.x.right){
-            this.position.x += shouldSpeed.x;
-          }
-          if (shouldSpeed.y<0) {
-            this.position.y += shouldSpeed.y;
-          }
-          if(shouldSpeed.y>0){
-            this.position.y += shouldSpeed.y
-          }
-        }
-        if (hitFace.y.top&&shouldSpeed.y > 0) {
-          this.position.y += shouldSpeed.y;
-        }
-    }else{
-      console.log("Error")
-    }
+      }
+      console.log(this.speed.y)
+      if (hitFace.y.bottom && !(this.speed.y < 0)) {
+        this.speed.y = 0;
+      }
+      if (hitFace.y.top && !(this.speed.y > 0)) {
+        this.speed.y = 0;
+      }
     super.update(tick);
+  }
+}
+  updateWithPlatformPos(shouldSpeed: { x: number; y: number; }){
+      // if (this.hitFace.x.left && shouldSpeed.x > 0) {
+      //   this.position.x += shouldSpeed.x;
+      // }
+      // if (this.hitFace.x.right && shouldSpeed.x < 0) {
+      //   this.position.x += shouldSpeed.x;
+      // }
+      // if(this.hitFace.y.bottom){ 
+      //   if(!this.hitFace.x.left&&!this.hitFace.x.right){
+      //     this.position.x += shouldSpeed.x;
+      //   }
+      //   this.position.y += shouldSpeed.y;
+
+      // }
+      // if (this.hitFace.y.top&&shouldSpeed.y > 0) {
+      //   this.position.y += shouldSpeed.y;
+      // }
+  }
+  updateCross(cross: { directionX: number; directionY: number; },shouldSpeed: { x: number; y: number; }){
+    if(cross.directionX||cross.directionY){
+      this.position.y-=1
+    }
   }
   updateRelativePosition() {
     return this.position;

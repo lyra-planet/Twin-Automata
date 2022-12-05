@@ -13,9 +13,15 @@ import { blockObjectsFunc } from "./func";
   
   //1/4方块
   const blockObjectsList: number[][] = [
+    
     [_42X42_BlockSize.width*-1 ,_42X42_BlockSize.height*2],
-    [_42X42_BlockSize.width*0,_42X42_BlockSize.height*2],
-    [_42X42_BlockSize.width*1,_42X42_BlockSize.height*2],
+    [_42X42_BlockSize.width*0,_42X42_BlockSize.height*3],
+    [_42X42_BlockSize.width*0,_42X42_BlockSize.height*4],
+    [_42X42_BlockSize.width*2,_42X42_BlockSize.height*2],
+    [_42X42_BlockSize.width*0,_42X42_BlockSize.height*5],
+    [_42X42_BlockSize.width*0,_42X42_BlockSize.height*6],
+    [_42X42_BlockSize.width*0,_42X42_BlockSize.height*7],
+    [_42X42_BlockSize.width*3,_42X42_BlockSize.height*2],
     [_42X42_BlockSize.width*10,_42X42_BlockSize.height*9],
   ]
   

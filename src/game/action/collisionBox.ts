@@ -1,4 +1,4 @@
-import { Block, Player } from '../gameObjects/gameObjects';
+import { Block, MoveBlock, Player } from '../gameObjects/gameObjects';
 
 interface CollisionBoxBlockInitializationData{
   gameObject1:Player, 
@@ -28,7 +28,7 @@ export const collisionBox_Block = ({
       left:0,
       right:0
     }
-  
+
     const gameObject1Box = {
       top: Round(gameObject1.position.y - 60),
       bottom: Round(gameObject1.position.y),
@@ -54,19 +54,19 @@ export const collisionBox_Block = ({
     let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
     gameObject2Box.top<gameObject1Box.bottom
 
-    let directionX = (gameObject1Box.middle.x>=gameObject2Box.middle.x?1:0)
-    let directionY = (gameObject1Box.middle.y >=gameObject2Box.middle.y?1:0)
+    let directionX = (gameObject1Box.middle.x>=gameObject2Box.middle.x?1:-1)
+    let directionY = (gameObject1Box.middle.y >=gameObject2Box.middle.y?1:-1)
     if(collisionX){
-        if(directionY&&
+        if(directionY===1&&
         gameObject2Box.bottom>=gameObject1Box.top+gameObject1.speed.y){
         hitFace.y.top = 1  
-        }else if(!(directionY)&&
+        }else if((directionY===-1)&&
         gameObject1Box.bottom+gameObject1.speed.y>=gameObject2Box.top
         ){
         hitFace.y.bottom = 1  
       }
     }else if(collisionY){     
-      if(directionX&&
+      if(directionX===1&&
         (gameObject1Box.left+gameObject1.speed.x<=gameObject2Box.right)){ 
           if((!isRightDown)||(isLeftDown)||(gameObject1.speed.x<0)){hitFace.x.left = 1} 
           if(isLeftDown){
@@ -75,7 +75,7 @@ export const collisionBox_Block = ({
             wallJump.left = 1
           }
           }
-      }else if((!directionX)&&
+      }else if((directionX===-1)&&
         (gameObject1Box.right+gameObject1.speed.x>=gameObject2Box.left)){
           if((!isLeftDown)||(isRightDown)||(gameObject1.speed.x>0)){hitFace.x.right = 1} 
           if(isRightDown){
@@ -86,63 +86,31 @@ export const collisionBox_Block = ({
           }  
       } 
     } 
+    let cross = {
+      corssed:false,
+      directionX:0,
+      directionY:0
+    }
     if(collisionY&&collisionX){
-      
+      cross.corssed=true
+      cross.directionX=directionX
+      cross.directionY=directionY
     }
     return {
       hitFace:hitFace,
       stickFace:stickFace,
-      wallJump:wallJump
+      wallJump:wallJump,
+      cross:cross
     }
-  } 
-  interface CollisionBoxTrapBlockInitializationData{
+} 
+interface CollisionBoxMoveBlockInitializationData{
     gameObject1:Player, 
-    gameObject2:Block,
-  }
-  export const collisionBox_TrapBlock = ({
-  gameObject1, 
-  gameObject2,
-}:CollisionBoxTrapBlockInitializationData
-    ) => {
-    const Round = Math.round
-    const gameObject1Box = {
-      top: Round(gameObject1.position.y - 60),
-      bottom: Round(gameObject1.position.y),
-      left: Round(gameObject1.position.x - 14),
-      right: Round(gameObject1.position.x + 14),
-      middle:{
-        x:Round(gameObject1.position.x),
-        y:Round(gameObject1.position.y - 30)
-      }
-    };
-    const gameObject2Box = {
-      top: Round(gameObject2.position.y - gameObject2.position.height)+2,
-      bottom: Round(gameObject2.position.y)-2 ,
-      left: Round(gameObject2.position.x - gameObject2.position.width / 2),
-      right: Round(gameObject2.position.x + gameObject2.position.width / 2),
-      middle:{
-        x:Round(gameObject2.position.x),
-        y:Round(gameObject2.position.y - gameObject2.position.height/2)
-      }
-    };
-    let collisionX = gameObject1Box.right> gameObject2Box.left&&
-    gameObject2Box.right > gameObject1Box.left
-    let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
-    gameObject2Box.top<gameObject1Box.bottom
-    if(collisionX&&collisionY){
-      console.log("Dead")
-    }
-  } 
-
-  interface CollisionBoxMoveBlockInitializationData{
-    gameObject1:Player, 
-    gameObject2:Block,
+    gameObject2:MoveBlock,
     isLeftDown:boolean,
     isRightDown:boolean,
     isSpaceDown:boolean,
-  }
-  
-  export const collisionBox_MoveBlock = ({
+}
+export const collisionBox_MoveBlock = ({
     gameObject1, 
     gameObject2,
     isLeftDown,
@@ -188,24 +156,25 @@ export const collisionBox_Block = ({
       let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
       gameObject2Box.top<gameObject1Box.bottom
   
-      let directionX = (gameObject1Box.middle.x>=gameObject2Box.middle.x?1:0)
-      let directionY = (gameObject1Box.middle.y >=gameObject2Box.middle.y?1:0)
+      let directionX = (gameObject1Box.middle.x>=gameObject2Box.middle.x?1:-1)
+      let directionY = (gameObject1Box.middle.y >=gameObject2Box.middle.y?1:-1)
       if(collisionX){ 
-          if(directionY&&
+          if(directionY===1&&
           gameObject2Box.bottom>=gameObject1Box.top+gameObject1.speed.y){
           shouldY=true
           hitFace.y.top = 1  
-          }else if(!(directionY)&&
+          }else if((directionY===-1)&&
           gameObject1Box.bottom+gameObject1.speed.y>=gameObject2Box.top
           ){
           shouldY=true
+          gameObject2.standOnSelf=true
           hitFace.y.bottom = 1  
         }
       }else if(collisionY){     
-        if(directionX&&
+        if(directionX===1&&
           (gameObject1Box.left+gameObject1.speed.x<=gameObject2Box.right)){ 
             shouldX=true
-            hitFace.x.left = 1
+            if((!isRightDown)||(isLeftDown)||(gameObject1.speed.x<0)){hitFace.x.left = 1} 
             if(isLeftDown){
               
               stickFace.left=1
@@ -213,10 +182,10 @@ export const collisionBox_Block = ({
               wallJump.left = 1
             }
             }
-        }else if((!directionX)&&
+        }else if((directionX===-1)&&
           (gameObject1Box.right+gameObject1.speed.x>=gameObject2Box.left)){
             shouldX=true
-            hitFace.x.right = 1
+            if((!isLeftDown)||(isRightDown)||(gameObject1.speed.x>0)){hitFace.x.right = 1} 
              if(isRightDown){
               stickFace.right=1
               if(isSpaceDown){
@@ -224,14 +193,23 @@ export const collisionBox_Block = ({
               }
             }  
         } 
-      } 
-      if(collisionY&&collisionX){
-        console.log("交叉了")
       }
+      let cross = {
+        corssed:false,
+        directionX:0,
+        directionY:0
+      }
+      if(collisionY&&collisionX){
+        cross.corssed=true
+        cross.directionX=directionX
+        cross.directionY=directionY
+      }
+      
       return {
         hitFace:hitFace,
         stickFace:stickFace,
         wallJump:wallJump,
+        cross:cross,
         shouldMove:{
           should:{
             x:shouldX,
@@ -241,4 +219,43 @@ export const collisionBox_Block = ({
           shouldSpeedY:gameObject2.speed.y
         }
       }
-    } 
+} 
+interface CollisionBoxTrapBlockInitializationData{
+    gameObject1:Player, 
+    gameObject2:Block,
+}
+export const collisionBox_TrapBlock = ({
+  gameObject1, 
+  gameObject2,
+}:CollisionBoxTrapBlockInitializationData
+    ) => {
+    const Round = Math.round
+    const gameObject1Box = {
+      top: Round(gameObject1.position.y - 60),
+      bottom: Round(gameObject1.position.y),
+      left: Round(gameObject1.position.x - 14),
+      right: Round(gameObject1.position.x + 14),
+      middle:{
+        x:Round(gameObject1.position.x),
+        y:Round(gameObject1.position.y - 30)
+      }
+    };
+    const gameObject2Box = {
+      top: Round(gameObject2.position.y - gameObject2.position.height)+2,
+      bottom: Round(gameObject2.position.y)-2 ,
+      left: Round(gameObject2.position.x - gameObject2.position.width / 2),
+      right: Round(gameObject2.position.x + gameObject2.position.width / 2),
+      middle:{
+        x:Round(gameObject2.position.x),
+        y:Round(gameObject2.position.y - gameObject2.position.height/2)
+      }
+    };
+    let collisionX = gameObject1Box.right> gameObject2Box.left&&
+    gameObject2Box.right > gameObject1Box.left
+    let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
+    gameObject2Box.top<gameObject1Box.bottom
+    if(collisionX&&collisionY){
+      console.log("Dead")
+    }
+} 
+
