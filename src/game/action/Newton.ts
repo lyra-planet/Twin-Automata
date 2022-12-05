@@ -1,22 +1,9 @@
-import { GroundPosition } from '../static/blocksSize';
-interface NewtonLawsOfMotionData{
-  position: { x: number; y: number; width: number; height: number; };
-  speed: { x: number; y: number; };
-  fa:number;
-  direction: number;
-  stop: number;
-  groundPosition: number;
-  hitFace: { x: { left: number; right: number; }; y: { top: number; bottom: number; }; };
-  shouldSpeed: {x: number;y: number;}
-}
-
-
+import { NewtonLawsOfMotionData } from '@game/types/action';
 
 export const NewtonLawsOfMotion = (
   {
     speed,fa, direction, stop,hitFace
   }:NewtonLawsOfMotionData
-  
   ) => {
     let g=0.2
   if (stop) {

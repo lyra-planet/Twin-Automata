@@ -1,58 +1,37 @@
 import * as PIXI from "pixi.js";
 import { Sprite } from "pixi.js";
-import { characterAnimation } from "../action/characterAnimation";
-import { NewtonLawsOfMotion } from "../action/Newton";
-import { GroundPosition } from "../static/blocksSize";
-import { adventurerObject } from "../Player/PlayerObject";
+import { characterAnimation } from "@game/action/characterAnimation";
+import { NewtonLawsOfMotion } from "@game/action/Newton";
+import { GroundPosition } from "@game/static/blocksSize";
+import { adventurerObject } from "@game/static/playerObject";
 import {
   blockTraceMovementObj,
-  T_BlockMoveMentTrace,
-} from "../action/blockMovementTrace";
+} from "@game/action/blockMovementTrace";
+import { BlockInitializationData, IBlock, IMoveBlock, IPlayer, PlayerInitializationData } from "@game/types/gameObjects";
+import {ICollisionState, ICross, ISpeed, IGameObjectFrame, IPosition, IScale, ISize, TGameObjectTexture } from "@game/types/global";
+import { T_BlockMoveMentTrace } from "@game/types/action";
+
 
 const blockTrace: T_BlockMoveMentTrace = {
   trace: [
     { x: -100, y: -200, duration: 200 },
+    { x: 100, y: 0, duration: 200 },
+    { x: -100, y: -200, duration: 200 },
+    { x: 100, y: 0, duration: 200 },
+    { x: -100, y: -200, duration: 200 },
+    { x: 100, y: 0, duration: 200 },
     { x: -100, y: 0, duration: 200 },
-    { x: -100, y: -200, duration: 200 },
-    { x: -100, y:0, duration: 200 },
-    { x: -100, y: -200, duration: 200 },
-    { x: -100, y:0, duration: 200 },
-    { x: -100, y: -200, duration: 200 },
   ],
   playStatus: "normal",
 };
-export interface BlockInitializationData {
-  imageSrc: string;
-  gameObjectFrame: {
-    [key: string]: number[][];
-  };
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  state: string;
-  frame: number;
-  actionSpeed: number;
-  actionStop: number;
-}
-
-export interface CollisionState {
-  shouldSpeed: { x: number; y: number };
-  hitFace: {
-    x: { left: number; right: number };
-    y: { top: number; bottom: number };
-  };
-  stickFace: { left: number; right: number };
-  wallJump: { left: number; right: number };
-  cross: {directionX:number,directionY:number}; 
-}
-export class Block {
-  position: { x: number; y: number; width: number; height: number };
-  scale: { x: number; y: number };
-  speed: { x: number; y: number };
+export class Block implements IBlock {
+  position: IPosition;
+  size: ISize;
+  scale: IScale;
+  speed: ISpeed;
   count: number;
-  gameObject: Sprite;
-  gameTexture: PIXI.Texture<PIXI.Resource>;
+  gameObject: PIXI.Sprite;
+  gameTexture: TGameObjectTexture;
   state: string;
   direction: number;
   stop: number;
@@ -62,28 +41,22 @@ export class Block {
   groundPosition: number;
   image: string;
   wallJumpStart: boolean;
-  movingState: CollisionState;
-  gameObjectFrame: {
-    [key: string]: number[][];
-  };
-
+  movingState: ICollisionState;
+  gameObjectFrame: IGameObjectFrame;
   constructor({
+    size,
     imageSrc,
     gameObjectFrame,
     state,
     actionSpeed,
     actionStop,
-    x,
-    y,
-    w,
-    h,
+    position,
   }: BlockInitializationData) {
     this.position = {
-      x: x + w / 2,
-      y: GroundPosition.y - y,
-      width: w,
-      height: h,
+      x: position.x + size.width / 2,
+      y: GroundPosition.y - position.y,
     };
+    this.size = size
     this.speed = {
       x: 0,
       y: 0,
@@ -104,14 +77,14 @@ export class Block {
     this.direction = 0;
     this.stop = 0;
     this.fa = 0.5;
-    this.groundPosition = y;
+    this.groundPosition = position.y;
     this.wallJumpStart = false;
     this.movingState = {
       hitFace: { x: { left: 0, right: 0 }, y: { top: 0, bottom: 0 } },
       stickFace: { left: 0, right: 0 },
       wallJump: { left: 0, right: 0 },
       shouldSpeed: { x: 0, y: 0 },
-      cross: {directionX:0,directionY:0}
+      cross: { directionX: 0, directionY: 0 }
     };
     this.gameObject = new Sprite(this.gameTexture);
     this.gameObject.anchor.y = 1;
@@ -152,10 +125,10 @@ export class Block {
     return this.gameObject;
   }
 }
-
-export class MoveBlock extends Block {
+export class MoveBlock extends Block implements IMoveBlock {
   objectMovement: blockTraceMovementObj;
   standOnSelf: boolean;
+  collisionX:boolean;
   constructor({
     imageSrc,
     gameObjectFrame,
@@ -163,10 +136,8 @@ export class MoveBlock extends Block {
     frame,
     actionSpeed,
     actionStop,
-    x,
-    y,
-    w,
-    h,
+    size,
+    position
   }: BlockInitializationData) {
     super({
       imageSrc,
@@ -175,10 +146,8 @@ export class MoveBlock extends Block {
       frame,
       actionSpeed,
       actionStop,
-      x,
-      y,
-      w,
-      h,
+      size,
+      position
     });
     this.scale = {
       x: 1,
@@ -190,6 +159,7 @@ export class MoveBlock extends Block {
       blockTrace
     );
     this.standOnSelf = false
+    this.collisionX = false
   }
   updateMovement(tick: number) {
     this.objectMovement?.blockTraceMovement(
@@ -197,33 +167,33 @@ export class MoveBlock extends Block {
       { x: this.gameObject.x, y: this.gameObject.y },
       tick
     );
-    if(this.standOnSelf){
-      adventurerObject.position.y+=this.speed.y
-      adventurerObject.position.x+=this.speed.x
-      this.standOnSelf=false
-    }
-    super.update(tick);
   }
-
+  update(tick: number): void {
+    if (this.standOnSelf) {
+      adventurerObject.position.y += this.speed.y
+      adventurerObject.position.x += this.speed.x
+      this.standOnSelf = false
+    }else if(this.collisionX){
+      adventurerObject.position.x+=this.speed.x
+      this.collisionX = false
+    }
+    super.update(tick)
+  }
   updateRelativePosition() {
     return this.position;
   }
 }
-
-export interface PlayerInitializationData extends BlockInitializationData {
-  groundPosition: number;
-}
-export class Player extends Block {
+export class Player extends Block implements IPlayer {
   hitFace: {
     x: {
-        left: number;
-        right: number;
+      left: number;
+      right: number;
     };
     y: {
-        top: number;
-        bottom: number;
+      top: number;
+      bottom: number;
     };
-}
+  }
   constructor({
     imageSrc,
     gameObjectFrame,
@@ -231,11 +201,9 @@ export class Player extends Block {
     frame,
     actionSpeed,
     actionStop,
-    x,
-    y,
-    w,
-    h,
     groundPosition,
+    size,
+    position
   }: PlayerInitializationData) {
     super({
       imageSrc,
@@ -244,10 +212,8 @@ export class Player extends Block {
       frame,
       actionSpeed,
       actionStop,
-      x,
-      y,
-      w,
-      h,
+      size,
+      position
     });
     this.groundPosition = GroundPosition.y - groundPosition;
     this.scale = {
@@ -255,18 +221,18 @@ export class Player extends Block {
       y: 2,
     };
     this.wallJumpStart = false;
-    this.hitFace={
+    this.hitFace = {
       x: {
-          left: 0,
-          right: 0,
+        left: 0,
+        right: 0,
       },
       y: {
-          top: 0,
-          bottom: 0,
+        top: 0,
+        bottom: 0,
       }
+    }
   }
-  }
-  updateMovement(tick: number, state: string, collisionState: CollisionState) {
+  updateMovement(tick: number, state: string, collisionState: ICollisionState) {
     this.state = state;
     if (this.speed.x === 0) {
       this.wallJumpStart = false;
@@ -284,7 +250,7 @@ export class Player extends Block {
       stop: this.stop,
       groundPosition: this.groundPosition,
       hitFace: hitFace,
-      shouldSpeed:shouldSpeed
+      shouldSpeed: shouldSpeed
     });
     if ((stickFace.left || stickFace.right) && !hitFace.y.bottom) {
       if (wallJump.left) {
@@ -306,7 +272,7 @@ export class Player extends Block {
         this.actionStop = 0;
       }
     }
-    if (hitFace) {   
+    if (hitFace) {
       if (hitFace.x.left) {
         if (this.speed.x < 0) {
           this.speed.x = 0;
@@ -317,37 +283,21 @@ export class Player extends Block {
           this.speed.x = 0;
         }
       }
-      console.log(this.speed.y)
       if (hitFace.y.bottom && !(this.speed.y < 0)) {
         this.speed.y = 0;
       }
       if (hitFace.y.top && !(this.speed.y > 0)) {
         this.speed.y = 0;
       }
-    super.update(tick);
+      super.update(tick);
+    }
   }
-}
-  updateWithPlatformPos(shouldSpeed: { x: number; y: number; }){
-      // if (this.hitFace.x.left && shouldSpeed.x > 0) {
-      //   this.position.x += shouldSpeed.x;
-      // }
-      // if (this.hitFace.x.right && shouldSpeed.x < 0) {
-      //   this.position.x += shouldSpeed.x;
-      // }
-      // if(this.hitFace.y.bottom){ 
-      //   if(!this.hitFace.x.left&&!this.hitFace.x.right){
-      //     this.position.x += shouldSpeed.x;
-      //   }
-      //   this.position.y += shouldSpeed.y;
-
-      // }
-      // if (this.hitFace.y.top&&shouldSpeed.y > 0) {
-      //   this.position.y += shouldSpeed.y;
-      // }
-  }
-  updateCross(cross: { directionX: number; directionY: number; },shouldSpeed: { x: number; y: number; }){
-    if(cross.directionX||cross.directionY){
-      this.position.y-=1
+  updateCross(cross: ICross, shouldSpeed: ISpeed) {
+    if (cross.directionX) {
+      this.position.y -= 1
+    }
+    if(cross.directionY){
+      this.speed.x=0
     }
   }
   updateRelativePosition() {

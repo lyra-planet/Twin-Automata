@@ -1,17 +1,6 @@
+import { CharacterAnimationData } from '@game/types/action'
 import * as PIXI from 'pixi.js'
 
-interface CharacterAnimationData{
-  character:PIXI.Sprite,
-  characterTexture:PIXI.Texture<PIXI.Resource>,
-  characterFrames:{
-    [key: string]: number[][];
-  },
-  state:string,
-  count:number,
-  tick:number,
-  characterActionspeed:number,
-  animationStop:number
-}
 
 
 export const characterAnimation = ({

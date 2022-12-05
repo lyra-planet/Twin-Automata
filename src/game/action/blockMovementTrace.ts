@@ -1,13 +1,5 @@
-export type T_BlockMoveMentTrace = {
- trace:T_BlockMoveMentSinglePort[];
- playStatus:T_PlayStatus;
-}
-export type T_BlockMoveMentSinglePort = {
- x:number;
- y:number;
- duration:number;
-} 
-export type T_PlayStatus = 'normal'|'reverse'|'infinite'|'cycle'
+import { T_BlockMoveMentTrace, T_BlockMoveMentSinglePort, T_PlayStatus } from "@game/types/action";
+import { IPosition, ISpeed } from "@game/types/global";
 
 export class blockTraceMovementObj {
     originPosition:{x:number,y:number};
@@ -19,7 +11,7 @@ export class blockTraceMovementObj {
     portIndex: number;
     originPort: any;
     speed: { x: number; y: number; };
-    constructor(originPosition:{x:number,y:number},blockTrace:T_BlockMoveMentTrace){
+    constructor(originPosition:IPosition,blockTrace:T_BlockMoveMentTrace){
         this.blockTrace = blockTrace
         this.wholeTrace = blockTrace.trace.map(({x,y,duration})=>({x:x+originPosition.x,y:y+originPosition.y,duration:duration}))
         this.playStatus = blockTrace.playStatus
@@ -33,8 +25,7 @@ export class blockTraceMovementObj {
             y:(this.nextPort.y -this.beforePort.y)/this.nextPort.duration
         }
     }
-    blockTraceMovement(speed:{x:number,y:number},position:{x:number,y:number},tick:number){
-
+    blockTraceMovement(speed:ISpeed,position:IPosition,tick:number){
         if(Math.abs(position.x-this.nextPort.x)<0.5&&Math.abs(position.y-this.nextPort.y)<0.5){  
             if(this.portIndex===this.wholeTrace.length-1){
                 speed.x=0

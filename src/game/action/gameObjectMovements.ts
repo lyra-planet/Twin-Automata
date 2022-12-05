@@ -1,14 +1,5 @@
-import { Player } from '../gameObjects/gameObjects';
+import { PlayerMovementData } from '@game/types/action';
 
-
-
-interface PlayerMovementData{
- playerObject:Player,
- isLeftDown:boolean;
- isRightDown:boolean;
- isSpaceDown:boolean;
- isShiftDown:boolean;
-}
 let sprint = false
 export const PlayerMovement = ({
   playerObject,
