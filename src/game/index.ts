@@ -108,6 +108,8 @@ export const initPIXI = () => {
           finallCollisionState.cross.directionX += item.cross.directionX
           finallCollisionState.cross.directionY += item.cross.directionY
         })
+        const moveObjects = moveBlockLists.moveObjects
+        adventurerObject.updateMoveObject(moveObjects)
         adventurerObject.updateMovement(tick, state, finallCollisionState)
         adventurerObject.updateCross(finallCollisionState.cross, finallCollisionState.shouldSpeed)
       }

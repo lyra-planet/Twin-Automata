@@ -53,7 +53,11 @@ export type T_BlockMoveMentSinglePort = {
 }
 export type T_PlayStatus = 'normal' | 'reverse' | 'infinite' | 'cycle'
 
-
+export interface IMoveObject{
+    weight:number,
+    speed:IMoveBlock["speed"],
+    stand:number
+  }
 
 export interface CharacterAnimationData{
     character:Sprite,

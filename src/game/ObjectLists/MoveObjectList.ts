@@ -1,11 +1,13 @@
 import { collisionBox_MoveBlock } from "@game/action/collisionBox";
 import { MoveBlock, Player } from "@game/gameObjects/gameObjects";
+import { IMoveObject } from "@game/types/action";
 import { ICollisionState, ISpeed } from "@game/types/global";
 import * as PIXI from 'pixi.js'
 export class MoveBlockObjectLists{
     objectLists: MoveBlock[][]
     stage: PIXI.Container<PIXI.DisplayObject>
     collisionState:ICollisionState
+    moveObjects:IMoveObject[]
     constructor(objectLists:MoveBlock[][],stage:PIXI.Container<PIXI.DisplayObject>){
       this.objectLists = objectLists
       this.stage = stage
@@ -14,8 +16,9 @@ export class MoveBlockObjectLists{
         stickFace:{left:0,right:0},
         wallJump:{left:0,right:0},
         shouldSpeed:{x:0,y:0},
-        cross:{directionX:0,directionY:0}
+        cross:{directionX:0,directionY:0},
       }
+      this.moveObjects=[]
     }
     init =() => {    
       this.objectLists.forEach(objectList=>{
@@ -32,6 +35,7 @@ export class MoveBlockObjectLists{
         shouldSpeed:{x:0,y:0},
         cross:{directionX:0,directionY:0}
       }
+      this.moveObjects = []
       this.objectLists.forEach(objectList=>{
         objectList.forEach(object=>{
           object.update(tick)
@@ -80,7 +84,24 @@ export class MoveBlockObjectLists{
                 this.collisionState.cross.directionX =collisionState.cross.directionX
                 this.collisionState.cross.directionY = collisionState.cross.directionY
               }
+              this.updateMoveObject(collisionState.moveObject)
           })
         })
+      }
+
+    updateMoveObject=(moveObject:IMoveObject)=>{
+      const {weight,speed:{x,y},stand} = moveObject
+      let find = false
+      this.moveObjects = this.moveObjects.map(item=>{
+        if(item.speed.x===x&&item.speed.y===y){
+          item.weight+=weight
+          item.stand+=stand
+          find = true
+        }
+      return item
+      })
+      if(!find){
+        this.moveObjects.push(moveObject)
+      }
     }
   }
