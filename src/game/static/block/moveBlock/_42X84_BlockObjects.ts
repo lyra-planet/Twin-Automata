@@ -5,6 +5,7 @@ import {
   _42X84_MoveBlockPicture,
 } from "@game/static/gamePictures";
 import { blockObjectsFunc } from "./func";
+import { blockTrace } from "./trace";
 
 //竖直半方块
 const blockObjectsList: number[][] = [
@@ -13,5 +14,6 @@ export const _42X84_MoveBlockObjects = blockObjectsFunc(
   blockObjectsList,
   _42X84_MoveBlockPicture,
   _42X84_MoveBlockFrames,
-  _42X84_BlockSize
+  _42X84_BlockSize,
+  blockTrace
 );

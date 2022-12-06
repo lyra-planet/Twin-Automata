@@ -18,40 +18,35 @@ export interface NewtonLawsOfMotionData {
     hitFace: { x: { left: number; right: number; }; y: { top: number; bottom: number; }; };
     shouldSpeed: { x: number; y: number; }
 }
-export interface CollisionBoxBlockInitializationData {
+export interface CollisionBoxBlockInitData {
     gameObject1: IPlayer,
     gameObject2: IBlock,
     isLeftDown: boolean,
     isRightDown: boolean,
     isSpaceDown: boolean,
 }
-export interface CollisionBoxMoveBlockInitializationData {
+export interface CollisionBoxMoveBlockInitData {
     gameObject1: IPlayer,
     gameObject2: IMoveBlock,
     isLeftDown: boolean,
     isRightDown: boolean,
     isSpaceDown: boolean,
 }
-export interface CollisionBoxTrapBlockInitializationData {
+export interface CollisionBoxTrapBlockInitData {
     gameObject1: IPlayer,
     gameObject2: IBlock,
 }
 
-
-
-
-
-
-export type T_BlockMoveMentTrace = {
-    trace: T_BlockMoveMentSinglePort[];
-    playStatus: T_PlayStatus;
+export type TBlockMoveMentTrace = {
+    trace: TBlockMoveMentSinglePort[];
+    playStatus: TPlayStatus;
 }
-export type T_BlockMoveMentSinglePort = {
+export type TBlockMoveMentSinglePort = {
     x: number;
     y: number;
     duration: number;
 }
-export type T_PlayStatus = 'normal' | 'reverse' | 'infinite' | 'cycle'
+export type TPlayStatus = 'normal' | 'infinite' 
 
 export interface IMoveObject{
     weight:number,

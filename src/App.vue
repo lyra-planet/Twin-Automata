@@ -1,5 +1,5 @@
 <script>
-import {initPIXI} from "./game"
+import {game} from "./game"
 export default {
   data(){
     return{
@@ -12,7 +12,7 @@ export default {
   methods: {
   },
   mounted() {
-    initPIXI()
+    game.init()
   },
 }
 

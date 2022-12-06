@@ -66,6 +66,7 @@ export const allPicture = [
     _42X21_BlockPicture,
     _21X42_BlockPicture,
     _21X21_BlockPicture,
+    
     _84X84_TrapBlockPicture,
     _42X42_TrapBlockPicture,
     _84X42_TrapBlockPicture,

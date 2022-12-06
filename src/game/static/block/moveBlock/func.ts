@@ -1,11 +1,13 @@
 
 import { MoveBlock } from "@game/gameObjects/gameObjects";
+import { TBlockMoveMentTrace } from "@game/types/action";
 import { IGameObjectFrame, ISize } from "@game/types/global";
 export const blockObjectsFunc = (
   List: Array<number[]>,
   blockPicture: string,
   blockFrames: IGameObjectFrame,
-  blockSize: ISize
+  blockSize: ISize,
+  trace:TBlockMoveMentTrace
 ) => {
   let blockObjects: MoveBlock[] = [];
   List.forEach((blockObject: number[]) => {
@@ -19,6 +21,7 @@ export const blockObjectsFunc = (
         actionStop: 0,
         size:blockSize,
         position:{x: blockObject[0],y: blockObject[1],},
+        trace:trace
       })
     );
   });

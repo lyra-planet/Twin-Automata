@@ -1,36 +1,41 @@
-import { T_BlockMoveMentTrace, T_BlockMoveMentSinglePort, T_PlayStatus } from "@game/types/action";
+import { TBlockMoveMentTrace, TBlockMoveMentSinglePort, TPlayStatus } from "@game/types/action";
 import { IPosition, ISpeed } from "@game/types/global";
 
 export class blockTraceMovementObj {
-    originPosition:{x:number,y:number};
-    blockTrace:T_BlockMoveMentTrace
-    wholeTrace:T_BlockMoveMentSinglePort[];
-    playStatus:T_PlayStatus;
-    nextPort: T_BlockMoveMentSinglePort;
-    beforePort: T_BlockMoveMentSinglePort;
+    blockTrace:TBlockMoveMentTrace
+    wholeTrace:TBlockMoveMentSinglePort[];
+    playStatus:TPlayStatus;
+    nextPort: TBlockMoveMentSinglePort;
+    beforePort: TBlockMoveMentSinglePort;
     portIndex: number;
-    originPort: any;
-    speed: { x: number; y: number; };
-    constructor(originPosition:IPosition,blockTrace:T_BlockMoveMentTrace){
+    speed: ISpeed;
+    constructor(originPosition:IPosition,blockTrace:TBlockMoveMentTrace){
         this.blockTrace = blockTrace
         this.wholeTrace = blockTrace.trace.map(({x,y,duration})=>({x:x+originPosition.x,y:y+originPosition.y,duration:duration}))
         this.playStatus = blockTrace.playStatus
-        this.originPosition = originPosition
-        this.originPort = originPosition
         this.nextPort = this.wholeTrace[0]
-        this.beforePort = this.originPort
+        this.beforePort = {x:originPosition.x,y:originPosition.y,duration:0}
         this.portIndex = 0
         this.speed={
             x:(this.nextPort.x -this.beforePort.x)/this.nextPort.duration,
             y:(this.nextPort.y -this.beforePort.y)/this.nextPort.duration
         }
     }
-    blockTraceMovement(speed:ISpeed,position:IPosition,tick:number){
-        if(Math.abs(position.x-this.nextPort.x)<0.5&&Math.abs(position.y-this.nextPort.y)<0.5){  
+    blockTraceMovement(speed:ISpeed,position:IPosition){
+        if(Math.abs(position.x-this.nextPort.x)<0.5
+        &&Math.abs(position.y-this.nextPort.y)<0.5){  
             if(this.portIndex===this.wholeTrace.length-1){
                 speed.x=0
                 speed.y=0
-                this.portIndex=0
+                switch(this.playStatus){
+                    case'normal':{
+                        return
+                    }
+                    case 'infinite':{
+                        this.portIndex=-1
+                    }
+                }
+                return
             }
             this.portIndex++
             this.beforePort = this.nextPort

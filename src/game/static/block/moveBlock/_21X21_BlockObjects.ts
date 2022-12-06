@@ -4,6 +4,7 @@ import {
   _21X21_MoveBlockPicture,
 } from "@game/static/gamePictures";
 import { blockObjectsFunc } from "./func";
+import { blockTrace } from "./trace";
 
 //1/4方块
 const blockObjectsList: number[][] = [
@@ -15,5 +16,6 @@ export const _21X21_MoveBlockObjects = blockObjectsFunc(
   blockObjectsList,
   _21X21_MoveBlockPicture,
   _21X21_MoveBlockFrames,
-  _21X21_BlockSize
+  _21X21_BlockSize,
+  blockTrace
 );

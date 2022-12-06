@@ -1,4 +1,4 @@
-import { CollisionBoxBlockInitializationData, CollisionBoxMoveBlockInitializationData, CollisionBoxTrapBlockInitializationData, IMoveObject } from "@game/types/action"
+import { CollisionBoxBlockInitData, CollisionBoxMoveBlockInitData, CollisionBoxTrapBlockInitData, IMoveObject } from "@game/types/action"
 
 
 export const collisionBox_Block = ({
@@ -6,8 +6,7 @@ export const collisionBox_Block = ({
   gameObject2,
   isLeftDown,
   isRightDown,
-  isSpaceDown,}:CollisionBoxBlockInitializationData
-
+  isSpaceDown,}:CollisionBoxBlockInitData
     ) => {
     const Round = Math.round
     let hitFace = {
@@ -21,7 +20,6 @@ export const collisionBox_Block = ({
       left:0,
       right:0
     }
-
     const gameObject1Box = {
       top: Round(gameObject1.position.y - 60),
       bottom: Round(gameObject1.position.y),
@@ -46,7 +44,6 @@ export const collisionBox_Block = ({
     gameObject2Box.right > gameObject1Box.left
     let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
     gameObject2Box.top<gameObject1Box.bottom
-
     let directionX = (gameObject1Box.middle.x>=gameObject2Box.middle.x?1:-1)
     let directionY = (gameObject1Box.middle.y >=gameObject2Box.middle.y?1:-1)
     if(collisionX){
@@ -60,7 +57,7 @@ export const collisionBox_Block = ({
       }
     }else if(collisionY){     
       if(directionX===1&&
-        (gameObject1Box.left+gameObject1.speed.x<=gameObject2Box.right+gameObject2.speed.x)){ 
+        (gameObject1Box.left+gameObject1.speed.x<=gameObject2Box.right)){ 
           if((!isRightDown)||(isLeftDown)||(gameObject1.speed.x<0)){hitFace.x.left = 1} 
           if(isLeftDown){
             stickFace.left=1
@@ -69,7 +66,7 @@ export const collisionBox_Block = ({
           }
           }
       }else if((directionX===-1)&&
-        (gameObject1Box.right+gameObject1.speed.x>=gameObject2Box.left+gameObject2.speed.x)){
+        (gameObject1Box.right+gameObject1.speed.x>=gameObject2Box.left)){
           if((!isLeftDown)||(isRightDown)||(gameObject1.speed.x>0)){hitFace.x.right = 1} 
           if(isRightDown){
             stickFace.right=1
@@ -102,7 +99,7 @@ export const collisionBox_MoveBlock = ({
     gameObject2,
     isLeftDown,
     isRightDown,
-    isSpaceDown}:CollisionBoxMoveBlockInitializationData
+    isSpaceDown}:CollisionBoxMoveBlockInitData
       ) => {
       const Round = Math.round
       let hitFace = {
@@ -156,34 +153,34 @@ export const collisionBox_MoveBlock = ({
           gameObject2Box.bottom>=gameObject1Box.top+gameObject1.speed.y){
           shouldY=true
           hitFace.y.top = 1  
-          }else if((directionY===-1)&&
-          gameObject1Box.bottom+gameObject1.speed.y>=gameObject2Box.top
-          ){
-          shouldY=true
-          gameObject2.standOnSelf=true
-          hitFace.y.bottom = 1  
-
           moveObject={
             weight:1,
             speed:gameObject2.speed,
             stand:1
           }
-
+          }else if((directionY===-1)&&
+          gameObject1Box.bottom+gameObject1.speed.y>=gameObject2Box.top
+          ){
+          shouldY=true
+          hitFace.y.bottom = 1  
+          moveObject={
+            weight:1,
+            speed:gameObject2.speed,
+            stand:1
+          }
         }
       }else if(collisionY){   
         if(directionX===1&&
           (gameObject1Box.left+gameObject1.speed.x<=gameObject2Box.right+gameObject2.speed.x)){ 
             shouldX=true
-            gameObject2.collisionX = true
-
             moveObject={
               weight:1,
               speed:gameObject2.speed,
               stand:0
             }
-
             if((!isRightDown)||(isLeftDown)||(gameObject1.speed.x<0)){hitFace.x.left = 1} 
             if(isLeftDown){
+              moveObject.stand=1
               stickFace.left=1
             if(isSpaceDown){
               wallJump.left = 1
@@ -192,16 +189,14 @@ export const collisionBox_MoveBlock = ({
         }else if((directionX===-1)&&
           (gameObject1Box.right+gameObject1.speed.x>=gameObject2Box.left+gameObject2.speed.x)){
             shouldX=true
-            gameObject2.collisionX = true
-
             moveObject={
               weight:1,
               speed:gameObject2.speed,
               stand:0
             }
-
             if((!isLeftDown)||(isRightDown)||(gameObject1.speed.x>0)){hitFace.x.right = 1} 
              if(isRightDown){
+              moveObject.stand=1
               stickFace.right=1
               if(isSpaceDown){
                 wallJump.right = 1
@@ -219,7 +214,6 @@ export const collisionBox_MoveBlock = ({
         cross.directionX=directionX
         cross.directionY=directionY
       }
-      
       return {
         hitFace:hitFace,
         stickFace:stickFace,
@@ -240,7 +234,7 @@ export const collisionBox_MoveBlock = ({
 export const collisionBox_TrapBlock = ({
   gameObject1, 
   gameObject2,
-}:CollisionBoxTrapBlockInitializationData
+}:CollisionBoxTrapBlockInitData
     ) => {
     const Round = Math.round
     const gameObject1Box = {

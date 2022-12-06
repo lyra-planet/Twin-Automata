@@ -5,6 +5,7 @@ import {
 import { _84X84_BlockSize } from "@game/static/blocksSize";
 import { blockObjectsFunc } from "./func";
 import { _84X84_MoveBlockFrames } from "@game/static/gameFrame";
+import { blockTrace, upDownTrace } from "./trace";
 
 //全方块
 const blockObjectsList: number[][] = [
@@ -16,5 +17,6 @@ export const _84X84_MoveBlockObjects = blockObjectsFunc(
   blockObjectsList,
   _84X84_MoveBlockPicture,
   _84X84_MoveBlockFrames,
-  _84X84_BlockSize
+  _84X84_BlockSize,
+  upDownTrace
 );

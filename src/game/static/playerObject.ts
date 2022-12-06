@@ -6,7 +6,7 @@ import { Player } from "@game/gameObjects/gameObjects"
 import { adventurerFrames } from "@game/static/gameFrame";
 
 export const adventurerObject = new Player({
-  imageSrc:adventurePicture,
+  imageSrc: adventurePicture,
   gameObjectFrame:adventurerFrames,
   state:"stand", 
   frame:0, 

@@ -7,12 +7,12 @@ import { adventurerObject } from "@game/static/playerObject";
 import {
   blockTraceMovementObj,
 } from "@game/action/blockMovementTrace";
-import { BlockInitializationData, IBlock, IMoveBlock, IPlayer, PlayerInitializationData } from "@game/types/gameObjects";
+import { BlockInitData, IBlock, IMoveBlock, IPlayer, MoveBlockInitData, PlayerInitData,  } from "@game/types/gameObjects";
 import {ICollisionState, ICross, ISpeed, IGameObjectFrame, IPosition, IScale, ISize, TGameObjectTexture } from "@game/types/global";
-import { IMoveObject, T_BlockMoveMentTrace } from "@game/types/action";
+import { IMoveObject, TBlockMoveMentTrace } from "@game/types/action";
 
 
-const blockTrace: T_BlockMoveMentTrace = {
+const blockTrace: TBlockMoveMentTrace = {
   trace: [
     { x: -100, y: 0, duration: 200 },
     { x: 100, y: 0, duration: 200 },
@@ -51,7 +51,7 @@ export class Block implements IBlock {
     actionSpeed,
     actionStop,
     position,
-  }: BlockInitializationData) {
+  }: BlockInitData) {
     this.position = {
       x: position.x + size.width / 2,
       y: GroundPosition.y - position.y,
@@ -127,8 +127,7 @@ export class Block implements IBlock {
 }
 export class MoveBlock extends Block implements IMoveBlock {
   objectMovement: blockTraceMovementObj;
-  standOnSelf: boolean;
-  collisionX:boolean;
+  trace:TBlockMoveMentTrace
   constructor({
     imageSrc,
     gameObjectFrame,
@@ -137,8 +136,9 @@ export class MoveBlock extends Block implements IMoveBlock {
     actionSpeed,
     actionStop,
     size,
-    position
-  }: BlockInitializationData) {
+    position,
+    trace
+  }:MoveBlockInitData) {
     super({
       imageSrc,
       gameObjectFrame,
@@ -154,31 +154,17 @@ export class MoveBlock extends Block implements IMoveBlock {
       y: 1,
     };
     this.wallJumpStart = false;
+    this.trace=trace
     this.objectMovement = new blockTraceMovementObj(
       this.gameObject,
-      blockTrace
+      trace
     );
-    this.standOnSelf = false
-    this.collisionX = false
   }
   updateMovement(tick: number) {
     this.objectMovement?.blockTraceMovement(
       this.speed,
-      { x: this.gameObject.x, y: this.gameObject.y },
-      tick
+      { x: this.gameObject.x, y: this.gameObject.y }
     );
-  }
-  update(tick: number): void {
-    // if(this.collisionX){
-    //   adventurerObject.position.x+=this.speed.x
-    //   this.collisionX = false
-    // }else 
-    // if (this.standOnSelf) {
-    //   adventurerObject.position.y += this.speed.y
-    //   adventurerObject.position.x += this.speed.x
-    //   this.standOnSelf = false
-    // }
-    super.update(tick)
   }
   updateRelativePosition() {
     return this.position;
@@ -205,7 +191,7 @@ export class Player extends Block implements IPlayer {
     groundPosition,
     size,
     position
-  }: PlayerInitializationData) {
+  }: PlayerInitData) {
     super({
       imageSrc,
       gameObjectFrame,
@@ -233,7 +219,7 @@ export class Player extends Block implements IPlayer {
       }
     }
   }
-  updateMovement(tick: number, state: string, collisionState: ICollisionState) {
+    updateMovement(tick: number, state: string, collisionState: ICollisionState) {
     this.state = state;
     if (this.speed.x === 0) {
       this.wallJumpStart = false;
@@ -291,7 +277,6 @@ export class Player extends Block implements IPlayer {
         this.speed.y = 0;
       }
     }
-    super.update(tick);
   }
   updateCross(cross: ICross, shouldSpeed: ISpeed) {
     if (cross.directionX) {

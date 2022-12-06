@@ -1,6 +1,7 @@
 import { Sprite } from "pixi.js";
 import { blockTraceMovementObj } from "@game/action/blockMovementTrace";
 import { IPosition, IScale, ISpeed, TGameObjectTexture, ICollisionState, IGameObjectFrame, IHitFace, ICross, ISize } from "@game/types/global";
+import { TBlockMoveMentTrace } from "./action";
 
 export interface IBlock{
     position:IPosition;
@@ -26,8 +27,7 @@ export interface IBlock{
 }
 export interface IMoveBlock extends IBlock{
     objectMovement: blockTraceMovementObj;
-    standOnSelf: boolean;
-    collisionX:boolean;
+    trace:TBlockMoveMentTrace
     updateMovement:{(tick: number):void};
     updateRelativePosition:{():IPosition}
 }
@@ -37,7 +37,7 @@ export interface IPlayer extends IBlock{
     updateCross:{(cross:ICross,shouldSpeed:ISpeed):void}
     updateRelativePosition:{():IPosition}
 }
-export interface BlockInitializationData {
+export interface BlockInitData {
     imageSrc: string;
     gameObjectFrame: IGameObjectFrame
     state: string;
@@ -47,6 +47,9 @@ export interface BlockInitializationData {
     size:ISize;
     position:IPosition
 }
-export interface PlayerInitializationData extends BlockInitializationData {
+export interface MoveBlockInitData extends BlockInitData {
+    trace:TBlockMoveMentTrace
+}
+export interface PlayerInitData extends BlockInitData {
     groundPosition: number;
 }
