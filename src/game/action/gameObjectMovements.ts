@@ -1,10 +1,9 @@
 import { PlayerMovementData } from '@game/types/action';
-import { movementState, TMovementState } from './movementState';
+import { TMovementState } from './movementState';
 
-let sprint = false
 export const PlayerMovement = ({
   playerObject,
-  isLeftDown, isRightDown, isSpaceDown, isShiftDown
+  isLeftDown, isRightDown, isSpaceDown, isShiftDown,specialMovement
 }: PlayerMovementData
 ) => {
   const round = Math.round
@@ -13,7 +12,7 @@ export const PlayerMovement = ({
     state:'stand',
     move:{x:0,y:0}
   }
-  if (round(playerObject.speed.y) !== 0) {
+  if (!specialMovement.hitGround) {
     isSpaceDown = false
     state = "jump"
     playerState.state = 'float'
@@ -25,7 +24,6 @@ export const PlayerMovement = ({
       }
     }
   } else {
-    sprint = true
     if ((isLeftDown || isRightDown)) {
       if (playerObject.state != "run") {
         playerObject.count = 0
@@ -51,8 +49,9 @@ export const PlayerMovement = ({
       }
     }
   } 
-  if (isShiftDown && sprint) {
+  if (isShiftDown && specialMovement.dash &&( playerObject.speed.x!==0||playerObject.speed.y!==0)) {
     playerState.state='dash'
+    specialMovement.dash=false
     if (playerObject.speed.y !== 0) {
       playerState.move.y=1
     }
@@ -61,8 +60,6 @@ export const PlayerMovement = ({
     } else if (isLeftDown && playerObject.speed.x >= -3) {
       playerState.move.x=-1
     }
-    sprint = false
   }
-  movementState(playerState,playerObject)
-  return state
+  return playerState
 }

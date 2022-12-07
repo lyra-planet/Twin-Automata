@@ -36,6 +36,10 @@ export const movementState=(state:TMovementState,player:IPlayer)=>{
         break
         case 'jump':
             player.speed.y = -5
+            if (player.count === 5) {
+                player.actionStop = 1
+                player.count = 5
+              }
         break
         case 'run':
             player.fa = 0.1

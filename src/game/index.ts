@@ -8,6 +8,7 @@ import { allPicture } from "@game/static/gamePictures";
 import { GroundPosition } from "@game/static/blocksSize"
 import { ICollisionState, IPosition } from "@game/types/global";
 import { MoveBlockObjectLists } from "@game/objectLists/MoveObjectList";
+import { movementState } from "./action/movementState";
 
 
 
@@ -31,6 +32,7 @@ export class Game{
   framesThisSecond: number;
   lastFpsUpdate: number;
   delta: number;
+  specialMovement: {hitGround:boolean, dash: boolean;};
   constructor(){
     this.app = new PIXI.Application({
       width: GroundPosition.x,
@@ -55,6 +57,11 @@ export class Game{
       shouldSpeed: { x: 0, y: 0 },
       cross: { directionX: 0, directionY: 0 }
     }
+    this.specialMovement={
+      dash:false,
+      hitGround:false
+    }
+
     this.trapBlockLists=null
     this.blockLists=null
     this.moveBlockLists=null
@@ -68,7 +75,6 @@ export class Game{
     this.lastFpsUpdate = 0
     this.delta = 0
   }
-
   init(){
     const loader = new PIXI.Loader();
     this.app.stage.addChild(this.scenario)
@@ -110,46 +116,32 @@ export class Game{
     requestAnimationFrame(this.gameLoop);
   }
   update = () => {
-    this.tick += 1
-    const state = PlayerMovement({
-      playerObject: adventurerObject,
-      isLeftDown: this.isLeftDown,
-      isRightDown: this.isRightDown,
-      isSpaceDown: this.isSpaceDown,
-      isShiftDown: this.isShiftDown
-    })
+    this.tick += 1    
+    const state = this.movementUpdate()
     this.collisionUpdate(this.tick, state)
     this.objectsUpdate(this.tick)
     this.cameraMoveFollow()
   }
-  control = () => {
-    let left = keyboard(37),
-      right = keyboard(39),
-      space = keyboard(32),
-      shift = keyboard(16);
-    right.press = () => {
-      this.isRightDown = true;
-    };
-    right.release = () => {
-      this.isRightDown = false
-    };
-    left.press = () => {
-      this.isLeftDown = true
-    };
-    left.release = () => {
-      this.isLeftDown = false
-    };
-    space.press = () => {
-      this.isSpaceDown = true
-    };
-    space.release = () => {
-      this.isSpaceDown = false
-    };
-    shift.press = () => {
-      this.isShiftDown = true
-    };
-    shift.release = () => {
-      this.isShiftDown = false
+  movementUpdate=()=>{
+    this.specialMovementUpdate()
+    const moveState = PlayerMovement({
+      playerObject: adventurerObject,
+      isLeftDown: this.isLeftDown,
+      isRightDown: this.isRightDown,
+      isSpaceDown: this.isSpaceDown,
+      isShiftDown: this.isShiftDown,
+      specialMovement: this.specialMovement
+    })
+    movementState(moveState,adventurerObject)
+    const state = moveState.state
+    return state
+  }
+  specialMovementUpdate=()=>{
+    if(this.finallCollisionState.hitFace.y.bottom!==0){
+     this.specialMovement.hitGround=true
+     this.specialMovement.dash=true
+    }else{
+      this.specialMovement.hitGround=true
     }
   }
   collisionUpdate = (tick: number, state: string) => {
@@ -209,6 +201,36 @@ export class Game{
     this.moveBlockLists.update(tick)
     this.blockLists.update(tick)
     this.trapBlockLists.update(tick)
+  }
+  control = () => {
+    let left = keyboard(37),
+      right = keyboard(39),
+      space = keyboard(32),
+      shift = keyboard(16);
+    right.press = () => {
+      this.isRightDown = true;
+    };
+    right.release = () => {
+      this.isRightDown = false
+    };
+    left.press = () => {
+      this.isLeftDown = true
+    };
+    left.release = () => {
+      this.isLeftDown = false
+    };
+    space.press = () => {
+      this.isSpaceDown = true
+    };
+    space.release = () => {
+      this.isSpaceDown = false
+    };
+    shift.press = () => {
+      this.isShiftDown = true
+    };
+    shift.release = () => {
+      this.isShiftDown = false
+    }
   }
   cameraMoveFollow = () => {
     this.relativePosition = adventurerObject.updateRelativePosition()

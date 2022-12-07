@@ -7,6 +7,7 @@ export interface PlayerMovementData {
     isRightDown: boolean;
     isSpaceDown: boolean;
     isShiftDown: boolean;
+    specialMovement:{hitGround:boolean,dash:boolean}
 }
 export interface NewtonLawsOfMotionData {
     position: { x: number; y: number; };

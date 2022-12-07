@@ -20,6 +20,18 @@ export const adventurerFrames = {
     [ASIZE.width * 4, ASIZE.height * 4, ASIZE.width, ASIZE.height],
     [ASIZE.width * 5, ASIZE.height * 4, ASIZE.width, ASIZE.height],
     [ASIZE.width * 6, ASIZE.height * 4, ASIZE.width, ASIZE.height],],
+    float: [[ASIZE.width, ASIZE.height * 4, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 2, ASIZE.height * 4, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 3, ASIZE.height * 4, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 4, ASIZE.height * 4, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 5, ASIZE.height * 4, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 6, ASIZE.height * 4, ASIZE.width, ASIZE.height],],
+    dash:  [[ASIZE.width, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 2, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 3, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 4, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 5, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 6, ASIZE.height, ASIZE.width, ASIZE.height],],
     wallJump: [
         [ASIZE.width * 2, ASIZE.height * 11, ASIZE.width, ASIZE.height],
         [ASIZE.width * 3, ASIZE.height * 11, ASIZE.width, ASIZE.height]
