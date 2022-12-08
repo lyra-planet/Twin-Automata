@@ -1,12 +1,12 @@
 import * as PIXI from "pixi.js";
 import { keyboard } from "@game/control/keyboard";
 import { adventurerObject } from "@game/static/playerObject";
-import { BlockLists, TrapBlockLists, MoveBlockLists } from '@game/blockLists/blockLists';
-import { BlockObjectLists,  TrapBlockObjectLists } from "@game/objectLists/StaticObjectLists";
+import { BlockLists, TrapBlockLists, MoveBlockLists, DashBlockList } from '@game/blockLists/blockLists';
+import { BlockObjectLists,  DashBlockObjectLists,  TrapBlockObjectLists } from "@game/objectLists/StaticObjectLists";
 import { PlayerMovement } from "@game/action/gameObjectMovements";
 import { allPicture } from "@game/static/gamePictures";
 import { GroundPosition } from "@game/static/blocksSize"
-import { ICollisionState, IPosition } from "@game/types/global";
+import { ICollisionState, IPosition, TSpecialMovement } from "@game/types/global";
 import { MoveBlockObjectLists } from "@game/objectLists/MoveObjectList";
 import { movementState } from "./action/movementState";
 
@@ -32,7 +32,8 @@ export class Game{
   framesThisSecond: number;
   lastFpsUpdate: number;
   delta: number;
-  specialMovement: {hitGround:boolean, dash: boolean;};
+  specialMovement: TSpecialMovement;
+  dashBlockLists: DashBlockObjectLists | null
   constructor(){
     this.app = new PIXI.Application({
       width: GroundPosition.x,
@@ -59,12 +60,16 @@ export class Game{
     }
     this.specialMovement={
       dash:false,
-      hitGround:false
+      hit:{l:false,r:false,t:false,b:false},
+      stick:0,
+      wallJump:0
     }
 
     this.trapBlockLists=null
     this.blockLists=null
     this.moveBlockLists=null
+    this.dashBlockLists=null
+
     this.adventurer=null
     
 
@@ -87,13 +92,21 @@ export class Game{
   }
   setup = () => {
     //玩家属性初始化
+    this.adventurer = adventurerObject.init()
+    
+    
     this.trapBlockLists = new TrapBlockObjectLists(TrapBlockLists, this.scenario)
     this.blockLists = new BlockObjectLists(BlockLists, this.scenario)
     this.moveBlockLists = new MoveBlockObjectLists(MoveBlockLists, this.scenario)
-    this.adventurer = adventurerObject.init()
+    this.dashBlockLists = new DashBlockObjectLists(DashBlockList,this.scenario)
+    
+    
     this.blockLists.init()
     this.trapBlockLists.init()
     this.moveBlockLists.init()
+    this.dashBlockLists.init()
+
+
     this.scenario.addChild(this.adventurer);
     this.app.renderer.render(this.app.stage);
     this.control()
@@ -119,6 +132,9 @@ export class Game{
     this.tick += 1    
     const state = this.movementUpdate()
     this.collisionUpdate(this.tick, state)
+
+    this.specialUpdate()
+
     this.objectsUpdate(this.tick)
     this.cameraMoveFollow()
   }
@@ -137,13 +153,30 @@ export class Game{
     return state
   }
   specialMovementUpdate=()=>{
-    if(this.finallCollisionState.hitFace.y.bottom!==0){
-     this.specialMovement.hitGround=true
-     this.specialMovement.dash=true
+    const {hitFace,stickFace,wallJump} = this.finallCollisionState
+    if(hitFace.y.top!==0){
+      this.specialMovement.hit.t=true
     }else{
-      this.specialMovement.hitGround=true
+      this.specialMovement.hit.t=false
+    }    
+    if(hitFace.y.bottom!==0){
+      this.specialMovement.hit.b=true
+      this.specialMovement.dash=true
+    }else{
+      this.specialMovement.hit.b=false
     }
+    if(hitFace.x.left!==0){
+      this.specialMovement.hit.l=true
+    }else{
+      this.specialMovement.hit.l=false
+    }    
+    if(hitFace.x.right!==0){
+      this.specialMovement.hit.r=true
+    }else{
+      this.specialMovement.hit.r=false
+    }     
   }
+
   collisionUpdate = (tick: number, state: string) => {
     if(!this.moveBlockLists||!this.blockLists||!this.moveBlockLists||!this.trapBlockLists){
       return
@@ -169,9 +202,13 @@ export class Game{
     this.trapBlockLists.updateCollisionBox_TrapBlock(
       adventurerObject
     )
+     this.dashBlockLists?.updateCollisionBox(
+      adventurerObject
+    )
     //随平台移动
     const moveObjects = this.moveBlockLists.moveObjects
     adventurerObject.updateMoveObject(moveObjects)
+    
     //碰撞检测
     const allCollisionState = [this.blockLists.collisionState, this.moveBlockLists.collisionState]
     allCollisionState.map(item => {
@@ -188,6 +225,7 @@ export class Game{
       this.finallCollisionState.cross.directionX += item.cross.directionX
       this.finallCollisionState.cross.directionY += item.cross.directionY
     })
+
     adventurerObject.updateMovement(tick, state, this.finallCollisionState)
     //穿模修正
     adventurerObject.updateCross(this.finallCollisionState.cross, this.finallCollisionState.shouldSpeed)
@@ -201,7 +239,26 @@ export class Game{
     this.moveBlockLists.update(tick)
     this.blockLists.update(tick)
     this.trapBlockLists.update(tick)
+    this.dashBlockLists?.update(tick)
   }
+  specialUpdate = ()=>{
+    
+    const _special= [this.dashBlockLists?.special]
+    const special ={
+      dash:false,
+      dead:false
+    }
+
+    _special.forEach(item=>{
+      if(item?.dash){special.dash=true}
+      if(item?.dead){special.dead=true}
+    })
+    if(special.dash){
+      this.specialMovement.dash=true
+    }
+  }
+  
+  
   control = () => {
     let left = keyboard(37),
       right = keyboard(39),

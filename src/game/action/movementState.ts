@@ -1,7 +1,7 @@
 import { IPlayer } from "@game/types/gameObjects"
 
 export type TMovementState = {
-    state:'stand'|'jump'|'float'|'dash'|'run',
+    state:'stand'|'jump'|'float'|'dash'|'run'|'wallJump'|'stick',
     move:{x:number,y:number}
 }
 
@@ -79,6 +79,20 @@ export const movementState=(state:TMovementState,player:IPlayer)=>{
                     player.speed.y = 6
                 break
             }
+        break
+        case 'wallJump':
+            player.wallJumpStart=true
+            const {move:{x}}=state
+            player.speed.x = 4*x;
+            player.speed.y = -4*x;
+            player.direction = 1*x;
+            player.scale.x = 2*x;
+            break
+        break
+        case 'stick':
+            player.speed.y = 0.3;
+            player.count = 0;
+            player.actionStop = 0;
         break
         default:console.log("ERROR")
         break

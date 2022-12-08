@@ -21,6 +21,7 @@ import { _42X84_TrapBlockObjects } from "@game/static/block/trapBlock/_42X84_Blo
 import { _42X21_TrapBlockObjects } from "@game/static/block/trapBlock/_42X21_BlockObjects";
 import { _21X42_TrapBlockObjects } from "@game/static/block/trapBlock/_21X42_BlockObjects";
 import { _21X21_TrapBlockObjects } from "@game/static/block/trapBlock/_21X21_BlockObjects";
+import { _42X42_DashBlockObjects } from "@game/static/block/dashBlock/_42X42_BlockObjects";
 
 
 export const BlockLists = [
@@ -52,3 +53,7 @@ export const TrapBlockLists = [
   _21X42_TrapBlockObjects,
   _21X21_TrapBlockObjects,
 ];
+
+export const DashBlockList = [
+  _42X42_DashBlockObjects
+]

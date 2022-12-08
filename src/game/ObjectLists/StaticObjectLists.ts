@@ -1,5 +1,6 @@
-import {collisionBox_Block,collisionBox_TrapBlock} from '@game/action/collisionBox'
+import {collisionBox_Block,collisionBox_DashBlock,collisionBox_TrapBlock} from '@game/action/collisionBox'
 import { Block,  Player } from '@game/gameObjects/gameObjects';
+import { ISpecialBlock } from '@game/types/gameObjects';
 import { ICollisionState } from '@game/types/global';
 import * as PIXI from 'pixi.js'
 export class BlockObjectLists{
@@ -104,4 +105,59 @@ export class TrapBlockObjectLists{
           })
         })
     }
+}
+
+
+
+export class DashBlockObjectLists{
+  objectLists: ISpecialBlock[][]
+  stage: PIXI.Container<PIXI.DisplayObject>
+  special: { dash: boolean;dead:boolean };
+  constructor(objectLists:ISpecialBlock[][],stage:PIXI.Container<PIXI.DisplayObject>){
+    this.objectLists = objectLists
+    this.stage = stage
+
+    this.special={
+      dash:false,
+      dead:false
+    }
+
+
   }
+  init(){    
+    this.objectLists.forEach(objectList=>{
+      objectList.forEach(object=>{  
+        this.stage.addChild(object.init())
+      })
+    })
+  }
+  update(tick:number){
+    this.objectLists.forEach(objectList=>{
+      objectList.forEach(object=>{
+        object.update(tick)
+      })
+    })
+  }
+  updateCollisionBox(moveObject:Player){
+    this.specialClean()
+      this.objectLists.forEach(objectList=>{
+        objectList.forEach(object=>{
+        const special = collisionBox_DashBlock({
+          gameObject1:moveObject , 
+          gameObject2:object, 
+        })
+        if(special.dash){
+          this.special.dash=true
+        }
+        })
+      })
+  }
+
+  specialClean=()=>{
+    this.special={
+      dash:false,
+      dead:false
+    }
+  }
+
+}

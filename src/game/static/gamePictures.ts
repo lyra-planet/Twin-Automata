@@ -56,6 +56,10 @@ export const _42X84_TrapBlockPicture = _42X84_TRAP
 export const _42X21_TrapBlockPicture = _42X21_TRAP
 export const _21X42_TrapBlockPicture = _21X42_TRAP
 export const _21X21_TrapBlockPicture = _21X21_TRAP
+
+import _42X42_DASH_BLOCK from '@game/assets/dashBlock/_42X42_.png'
+export const _42X42_DashBlockPicture = _42X42_DASH_BLOCK
+
 //所有图片
 export const allPicture = [
     adventurePicture,
@@ -74,6 +78,7 @@ export const allPicture = [
     _42X21_TrapBlockPicture,
     _21X42_TrapBlockPicture,
     _21X21_TrapBlockPicture,
+
     _84X84_MoveBlockPicture,
     _42X42_MoveBlockPicture,
     _84X42_MoveBlockPicture,
@@ -81,4 +86,6 @@ export const allPicture = [
     _42X21_MoveBlockPicture,
     _21X42_MoveBlockPicture,
     _21X21_MoveBlockPicture,
+
+    _42X42_DashBlockPicture
 ]

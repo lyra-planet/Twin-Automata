@@ -35,6 +35,10 @@ export const adventurerFrames = {
     wallJump: [
         [ASIZE.width * 2, ASIZE.height * 11, ASIZE.width, ASIZE.height],
         [ASIZE.width * 3, ASIZE.height * 11, ASIZE.width, ASIZE.height]
+    ],
+    stick: [
+        [ASIZE.width * 2, ASIZE.height * 11, ASIZE.width, ASIZE.height],
+        [ASIZE.width * 3, ASIZE.height * 11, ASIZE.width, ASIZE.height]
     ]
 }
 //一般可碰撞方块动画
@@ -144,4 +148,18 @@ export const _21X21_TrapBlockFrames = {
     static: [
         [0, 0, _21X21_BlockSize.width, _21X21_BlockSize.height]
     ]
+}
+
+
+
+export const _42X42_DashBlockFrames = {
+    static: [
+        [0, 0, _42X42_BlockSize.width, _42X42_BlockSize.height]
+    ],
+    resuming: [[ASIZE.width, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 2, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 3, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 4, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 5, ASIZE.height, ASIZE.width, ASIZE.height],
+    [ASIZE.width * 6, ASIZE.height, ASIZE.width, ASIZE.height],],
 }

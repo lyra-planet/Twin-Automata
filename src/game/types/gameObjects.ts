@@ -1,7 +1,10 @@
 import { Sprite } from "pixi.js";
 import { blockTraceMovementObj } from "@game/action/blockMovementTrace";
-import { IPosition, IScale, ISpeed, TGameObjectTexture, ICollisionState, IGameObjectFrame, IHitFace, ICross, ISize } from "@game/types/global";
+import { IPosition, IScale, ISpeed, TGameObjectTexture, ICollisionState, IGameObjectFrame, IHitFace, ICross, ISize, TSpecialMovement } from "@game/types/global";
 import { TBlockMoveMentTrace } from "./action";
+
+
+export type TBlockType='collision'|'hitDead'|'hitDash'|'moveable'
 
 export interface IBlock{
     position:IPosition;
@@ -22,9 +25,20 @@ export interface IBlock{
     wallJumpStart:boolean;
     movingState:ICollisionState;
     gameObjectFrame:IGameObjectFrame,
+    blockTypes:TBlockType[]
     update:{(tick:number):void};
     init:{():Sprite};
 }
+export interface ISpecialBlock extends IBlock{
+    special: { dash: boolean; dead: boolean; };
+    resuming: boolean;
+    updateSpecial:(special: any) => {
+        dash: boolean;
+        dead: boolean;
+    }
+}
+
+
 export interface IMoveBlock extends IBlock{
     objectMovement: blockTraceMovementObj;
     trace:TBlockMoveMentTrace
@@ -33,7 +47,7 @@ export interface IMoveBlock extends IBlock{
 }
 export interface IPlayer extends IBlock{
     hitFace: IHitFace
-    updateMovement:{(tick: number, state: string, collisionState: ICollisionState):void};
+    updateMovement:{(tick: number, state: string, collisionState: ICollisionState,specialMovement:TSpecialMovement):void};
     updateCross:{(cross:ICross,shouldSpeed:ISpeed):void}
     updateRelativePosition:{():IPosition}
 }

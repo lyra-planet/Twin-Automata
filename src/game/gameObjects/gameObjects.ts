@@ -7,8 +7,8 @@ import { adventurerObject } from "@game/static/playerObject";
 import {
   blockTraceMovementObj,
 } from "@game/action/blockMovementTrace";
-import { BlockInitData, IBlock, IMoveBlock, IPlayer, MoveBlockInitData, PlayerInitData,  } from "@game/types/gameObjects";
-import {ICollisionState, ICross, ISpeed, IGameObjectFrame, IPosition, IScale, ISize, TGameObjectTexture } from "@game/types/global";
+import { BlockInitData, IBlock, IMoveBlock, IPlayer, ISpecialBlock, MoveBlockInitData, PlayerInitData, TBlockType,  } from "@game/types/gameObjects";
+import {ICollisionState, ICross, ISpeed, IGameObjectFrame, IPosition, IScale, ISize, TGameObjectTexture, TSpecialMovement } from "@game/types/global";
 import { IMoveObject, TBlockMoveMentTrace } from "@game/types/action";
 
 
@@ -43,6 +43,7 @@ export class Block implements IBlock {
   wallJumpStart: boolean;
   movingState: ICollisionState;
   gameObjectFrame: IGameObjectFrame;
+  blockTypes:TBlockType[]
   constructor({
     size,
     imageSrc,
@@ -92,6 +93,9 @@ export class Block implements IBlock {
     this.gameObject.x = this.position.x;
     this.gameObject.y = this.position.y;
     this.gameObject.scale = this.scale;
+
+    this.blockTypes=[]
+
   }
   update(tick: number) {
     this.count = characterAnimation({
@@ -125,6 +129,137 @@ export class Block implements IBlock {
     return this.gameObject;
   }
 }
+
+export class SpecialBlock extends Block implements ISpecialBlock {
+  special: { dash: boolean; dead: boolean; };
+  resuming: boolean;
+  constructor({
+    size,
+    imageSrc,
+    gameObjectFrame,
+    state,
+    frame,
+    actionSpeed,
+    actionStop,
+    position,
+  }: BlockInitData) {
+    
+    super({imageSrc,
+      gameObjectFrame,
+      state,
+      frame,
+      actionSpeed,
+      actionStop,
+      size,
+      position
+    })
+    this.position = {
+      x: position.x + size.width / 2,
+      y: GroundPosition.y - position.y,
+    };
+    this.size = size
+    this.speed = {
+      x: 0,
+      y: 0,
+    };
+    this.scale = {
+      x: 1,
+      y: 1,
+    };
+
+    //贴图动画
+    this.actionSpeed = actionSpeed;
+    this.actionStop = actionStop;
+    this.state = state;
+    this.gameObjectFrame = gameObjectFrame;
+    this.image = imageSrc;
+    this.gameTexture = PIXI.Texture.from(this.image);
+    this.count = 0;
+    this.direction = 0;
+    this.stop = 0;
+    this.fa = 0.5;
+    this.groundPosition = position.y;
+    this.wallJumpStart = false;
+    this.movingState = {
+      hitFace: { x: { left: 0, right: 0 }, y: { top: 0, bottom: 0 } },
+      stickFace: { left: 0, right: 0 },
+      wallJump: { left: 0, right: 0 },
+      shouldSpeed: { x: 0, y: 0 },
+      cross: { directionX: 0, directionY: 0 }
+    };
+    this.gameObject = new Sprite(this.gameTexture);
+    this.gameObject.anchor.y = 1;
+    this.gameObject.anchor.x = 0.5;
+    this.gameObject.x = this.position.x;
+    this.gameObject.y = this.position.y;
+    this.gameObject.scale = this.scale;
+
+    this.blockTypes=[]
+
+    this.special={
+      dash:false,
+      dead:false
+    }
+
+    this.resuming=false
+  }
+
+  updateSpecial=(special:any)=>{
+    this.specialClean()
+    if(this.resuming===false){
+      this.special=special
+      this.resuming=true
+      this.state='resuming'
+      this.count=0
+      setTimeout(()=>{
+        this.resuming=false
+        this.state='static'
+        this.count=0
+      },3000)
+    }
+    return this.special
+  }
+  specialClean=()=>{
+    this.special={
+      dash:false,
+      dead:false
+    }
+  }
+  update(tick: number) {
+    this.count = characterAnimation({
+      character: this.gameObject,
+      characterTexture: this.gameTexture,
+      characterFrames: this.gameObjectFrame,
+      state: this.state,
+      count: this.count,
+      tick: tick,
+      characterActionspeed: this.actionSpeed,
+      animationStop: this.actionStop,
+    });
+    this.position.x += this.speed.x;
+    this.position.y += this.speed.y;
+    this.speed.x = this.speed.x;
+    this.gameObject.x = this.position.x;
+    this.gameObject.y = this.position.y;
+    this.gameObject.scale = this.scale;
+  }
+  init() {
+    characterAnimation({
+      character: this.gameObject,
+      characterTexture: this.gameTexture,
+      characterFrames: this.gameObjectFrame,
+      state: this.state,
+      count: this.count,
+      tick: 0,
+      characterActionspeed: this.actionSpeed,
+      animationStop: this.actionStop,
+    });
+    return this.gameObject;
+  }
+}
+
+
+
 export class MoveBlock extends Block implements IMoveBlock {
   objectMovement: blockTraceMovementObj;
   trace:TBlockMoveMentTrace
@@ -170,6 +305,7 @@ export class MoveBlock extends Block implements IMoveBlock {
     return this.position;
   }
 }
+
 export class Player extends Block implements IPlayer {
   hitFace: {
     x: {
@@ -219,11 +355,9 @@ export class Player extends Block implements IPlayer {
       }
     }
   }
-    updateMovement(tick: number, state: string, collisionState: ICollisionState) {
+  updateMovement(tick: number, state: string, collisionState: ICollisionState) {
     this.state = state;
-    if (this.speed.x === 0) {
-      this.wallJumpStart = false;
-    }
+
     let hitFace = collisionState.hitFace;
     let stickFace = collisionState.stickFace;
     let wallJump = collisionState.wallJump;
@@ -239,26 +373,8 @@ export class Player extends Block implements IPlayer {
       hitFace: hitFace,
       shouldSpeed: shouldSpeed
     });
-    if ((stickFace.left || stickFace.right) && !hitFace.y.bottom) {
-      if (wallJump.left) {
-        this.speed.x = 4;
-        this.speed.y = -4;
-        this.direction = 1;
-        this.scale.x = 2;
-        this.wallJumpStart = true;
-      } else if (wallJump.right) {
-        this.speed.x = -4;
-        this.speed.y = -4;
-        this.direction = -1;
-        this.scale.x = -2;
-        this.wallJumpStart = true;
-      } else {
-        this.speed.y = 0.3;
-        this.count = 0;
-        this.state = "wallJump";
-        this.actionStop = 0;
-      }
-    }
+
+    this.updateSpecialMovement(stickFace,hitFace,wallJump)
     if (hitFace) {
       if (hitFace.x.left) {
         if (this.speed.x < 0) {
@@ -284,6 +400,31 @@ export class Player extends Block implements IPlayer {
     }
     if(cross.directionY){
       this.speed.x=0
+    }
+  }
+  updateSpecialMovement(stickFace:any,hitFace:any,wallJump:any){
+    if (this.speed.x === 0) {
+      this.wallJumpStart = false;
+    }
+    if ((stickFace.left || stickFace.right) && !hitFace.y.bottom) {
+      if (wallJump.left) {
+        this.speed.x = 4;
+        this.speed.y = -4;
+        this.direction = 1;
+        this.scale.x = 2;
+        this.wallJumpStart = true;
+      } else if (wallJump.right) {
+        this.speed.x = -4;
+        this.speed.y = -4;
+        this.direction = -1;
+        this.scale.x = -2;
+        this.wallJumpStart = true;
+      } else {
+        this.speed.y = 0.3;
+        this.count = 0;
+        this.state = "wallJump";
+        this.actionStop = 0;
+      }
     }
   }
   updateMoveObject(moveObjects:IMoveObject[]): void {

@@ -7,14 +7,12 @@ export const PlayerMovement = ({
 }: PlayerMovementData
 ) => {
   const round = Math.round
-  let state = "stand"
   let playerState:TMovementState = {
     state:'stand',
     move:{x:0,y:0}
   }
-  if (!specialMovement.hitGround) {
+  if (!specialMovement.hit.b) {
     isSpaceDown = false
-    state = "jump"
     playerState.state = 'float'
     if ((isLeftDown || isRightDown) && !playerObject.wallJumpStart) {
       if (isLeftDown && playerObject.speed.x >= -3) {
@@ -23,12 +21,12 @@ export const PlayerMovement = ({
         playerState.move.x=1
       }
     }
+
   } else {
     if ((isLeftDown || isRightDown)) {
       if (playerObject.state != "run") {
         playerObject.count = 0
       }
-      state = "run"
       playerState.state='run'
       if (isLeftDown && playerObject.speed.x >= -3) {
         playerState.move.x=-1
@@ -40,7 +38,6 @@ export const PlayerMovement = ({
       if (playerObject.state != "stand") {
         playerObject.count = 0
       }
-      state = "stand"
       playerState.state='stand'
     }
     if (isSpaceDown) {
@@ -49,7 +46,8 @@ export const PlayerMovement = ({
       }
     }
   } 
-  if (isShiftDown && specialMovement.dash &&( playerObject.speed.x!==0||playerObject.speed.y!==0)) {
+
+  if (isShiftDown && specialMovement.dash &&(playerObject.speed.x!==0||playerObject.speed.y!==0)) {
     playerState.state='dash'
     specialMovement.dash=false
     if (playerObject.speed.y !== 0) {
@@ -61,5 +59,6 @@ export const PlayerMovement = ({
       playerState.move.x=-1
     }
   }
+
   return playerState
 }

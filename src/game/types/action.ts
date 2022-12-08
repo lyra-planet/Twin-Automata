@@ -1,5 +1,6 @@
 import { Sprite,Texture,Resource } from "pixi.js";
-import { IBlock, IMoveBlock, IPlayer } from "@game/types/gameObjects";
+import { IBlock, IMoveBlock, IPlayer, ISpecialBlock } from "@game/types/gameObjects";
+import { TSpecialMovement } from "./global";
 
 export interface PlayerMovementData {
     playerObject: IPlayer,
@@ -7,8 +8,9 @@ export interface PlayerMovementData {
     isRightDown: boolean;
     isSpaceDown: boolean;
     isShiftDown: boolean;
-    specialMovement:{hitGround:boolean,dash:boolean}
+    specialMovement:TSpecialMovement
 }
+
 export interface NewtonLawsOfMotionData {
     position: { x: number; y: number; };
     speed: { x: number; y: number; };
@@ -37,7 +39,10 @@ export interface CollisionBoxTrapBlockInitData {
     gameObject1: IPlayer,
     gameObject2: IBlock,
 }
-
+export interface CollisionBoxSpecialBlockInitData {
+    gameObject1: IPlayer,
+    gameObject2: ISpecialBlock,
+}
 export type TBlockMoveMentTrace = {
     trace: TBlockMoveMentSinglePort[];
     playStatus: TPlayStatus;

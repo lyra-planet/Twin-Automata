@@ -1,4 +1,4 @@
-import { CollisionBoxBlockInitData, CollisionBoxMoveBlockInitData, CollisionBoxTrapBlockInitData, IMoveObject } from "@game/types/action"
+import { CollisionBoxBlockInitData, CollisionBoxMoveBlockInitData, CollisionBoxSpecialBlockInitData, CollisionBoxTrapBlockInitData, IMoveObject } from "@game/types/action"
 
 
 export const collisionBox_Block = ({
@@ -264,4 +264,50 @@ export const collisionBox_TrapBlock = ({
     if(collisionX&&collisionY){
       console.log("Dead")
     }
+} 
+
+export const collisionBox_DashBlock = ({
+  gameObject1, 
+  gameObject2,
+}:CollisionBoxSpecialBlockInitData
+    ) => {
+    const Round = Math.round
+
+    let special={
+      dash:false,
+      dead:false
+    }
+
+
+
+    const gameObject1Box = {
+      top: Round(gameObject1.position.y - 60),
+      bottom: Round(gameObject1.position.y),
+      left: Round(gameObject1.position.x - 14),
+      right: Round(gameObject1.position.x + 14),
+      middle:{
+        x:Round(gameObject1.position.x),
+        y:Round(gameObject1.position.y - 30)
+      }
+    };
+    const gameObject2Box = {
+      top: Round(gameObject2.position.y - gameObject2.size.height)+2,
+      bottom: Round(gameObject2.position.y)-2 ,
+      left: Round(gameObject2.position.x - gameObject2.size.width / 2),
+      right: Round(gameObject2.position.x + gameObject2.size.width / 2),
+      middle:{
+        x:Round(gameObject2.position.x),
+        y:Round(gameObject2.position.y - gameObject2.size.height/2)
+      }
+    };
+    let collisionX = gameObject1Box.right> gameObject2Box.left&&
+    gameObject2Box.right > gameObject1Box.left
+    let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
+    gameObject2Box.top<gameObject1Box.bottom
+
+    if(collisionX&&collisionY){
+      special.dash=true
+      special={...gameObject2.updateSpecial(special)}
+    }
+    return special
 } 

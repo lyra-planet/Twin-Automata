@@ -1,6 +1,4 @@
 import { Resource, Texture } from "pixi.js";
-import { IPlayer } from "@game/types/gameObjects";
-
 
 
 export interface ISize {width:number,height:number}
@@ -18,6 +16,16 @@ export interface ICollisionState {
     wallJump: { left: number; right: number };
     cross: { directionX: number, directionY: number };
 }
+export type TSpecialMovement={
+    dash:boolean,
+    hit:{l:boolean,r:boolean,t:boolean,b:boolean},
+    stick:-1 | 0 | 1
+    wallJump:-1 | 0 | 1,
+}
+
+
+
+
 export interface IHitFace {
     x: {
         left: number;
