@@ -16,6 +16,7 @@ export interface ICollisionState {
     wallJump: { left: number; right: number };
     cross: { directionX: number, directionY: number };
 }
+export type TCollisionBox={t:number,b:number,l:number,r:number,m:{x:number,y:number}}
 export type TSpecialMovement={
     dash:boolean,
     hit:{l:boolean,r:boolean,t:boolean,b:boolean},

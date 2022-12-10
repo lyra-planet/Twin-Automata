@@ -34,6 +34,7 @@ export class Game{
   delta: number;
   specialMovement: TSpecialMovement;
   dashBlockLists: DashBlockObjectLists | null
+  rotation: number;
   constructor(){
     this.app = new PIXI.Application({
       width: GroundPosition.x,
@@ -79,6 +80,7 @@ export class Game{
     this.framesThisSecond = 0
     this.lastFpsUpdate = 0
     this.delta = 0
+    this.rotation=1
   }
   init(){
     const loader = new PIXI.Loader();
@@ -136,7 +138,7 @@ export class Game{
     this.specialUpdate()
 
     this.objectsUpdate(this.tick)
-    this.cameraMoveFollow()
+    this.cameraMoveFollow(this.tick)
   }
   movementUpdate=()=>{
     this.specialMovementUpdate()
@@ -176,7 +178,6 @@ export class Game{
       this.specialMovement.hit.r=false
     }     
   }
-
   collisionUpdate = (tick: number, state: string) => {
     if(!this.moveBlockLists||!this.blockLists||!this.moveBlockLists||!this.trapBlockLists){
       return
@@ -257,8 +258,6 @@ export class Game{
       this.specialMovement.dash=true
     }
   }
-  
-  
   control = () => {
     let left = keyboard(37),
       right = keyboard(39),
@@ -289,10 +288,16 @@ export class Game{
       this.isShiftDown = false
     }
   }
-  cameraMoveFollow = () => {
+  cameraMoveFollow = (tick: any) => {
     this.relativePosition = adventurerObject.updateRelativePosition()
-    this.scenario.x = -(this.relativePosition.x - GroundPosition.x / 2)
-    this.scenario.y = -(this.relativePosition.y - GroundPosition.y / 2 - 100)
+    // this.scenario.x =   this.relativePosition.x
+    // this.scenario.y =   this.relativePosition.y
+    this.scenario.x =GroundPosition.x/2;
+    this.scenario.y =GroundPosition.y/2;
+    this.scenario.pivot.x = GroundPosition.x/2-this.relativePosition.x;
+    this.scenario.pivot.y = GroundPosition.y/2-this.relativePosition.y;
+
+    this.scenario.rotation=Math.PI/2*this.rotation
     this.isSpaceDown = false
   }
   drawFPS = (fps: number) => {

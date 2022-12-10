@@ -11,7 +11,7 @@ export const PlayerMovement = ({
     state:'stand',
     move:{x:0,y:0}
   }
-  if (!specialMovement.hit.b) {
+  if (!specialMovement.hit.r) {
     isSpaceDown = false
     playerState.state = 'float'
     if ((isLeftDown || isRightDown) && !playerObject.wallJumpStart) {
@@ -46,7 +46,6 @@ export const PlayerMovement = ({
       }
     }
   } 
-
   if (isShiftDown && specialMovement.dash &&(playerObject.speed.x!==0||playerObject.speed.y!==0)) {
     playerState.state='dash'
     specialMovement.dash=false

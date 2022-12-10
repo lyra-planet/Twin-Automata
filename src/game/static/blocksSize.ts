@@ -38,8 +38,8 @@ export const _21X21_BlockSize:ISize = {
     height:_84X84_BlockSize.height/4
 }
 export const GroundPosition:IPosition= {
-    x: _84X84_BlockSize.width*20,
-    y: _84X84_BlockSize.height*13,
+    x: _84X84_BlockSize.width*10,
+    y: _84X84_BlockSize.height*10,
 }
 export const BornPosition:IPosition = {
     x:_84X84_BlockSize.width,

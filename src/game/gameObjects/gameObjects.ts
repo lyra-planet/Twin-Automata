@@ -3,12 +3,11 @@ import { Sprite } from "pixi.js";
 import { characterAnimation } from "@game/action/characterAnimation";
 import { NewtonLawsOfMotion } from "@game/action/Newton";
 import { GroundPosition } from "@game/static/blocksSize";
-import { adventurerObject } from "@game/static/playerObject";
 import {
   blockTraceMovementObj,
 } from "@game/action/blockMovementTrace";
 import { BlockInitData, IBlock, IMoveBlock, IPlayer, ISpecialBlock, MoveBlockInitData, PlayerInitData, TBlockType,  } from "@game/types/gameObjects";
-import {ICollisionState, ICross, ISpeed, IGameObjectFrame, IPosition, IScale, ISize, TGameObjectTexture, TSpecialMovement } from "@game/types/global";
+import {ICollisionState, ICross, ISpeed, IGameObjectFrame, IPosition, IScale, ISize, TGameObjectTexture, TSpecialMovement, TCollisionBox, IHitFace } from "@game/types/global";
 import { IMoveObject, TBlockMoveMentTrace } from "@game/types/action";
 
 
@@ -43,6 +42,7 @@ export class Block implements IBlock {
   wallJumpStart: boolean;
   movingState: ICollisionState;
   gameObjectFrame: IGameObjectFrame;
+  collisionBox:TCollisionBox
   blockTypes:TBlockType[]
   constructor({
     size,
@@ -66,7 +66,6 @@ export class Block implements IBlock {
       x: 1,
       y: 1,
     };
-
     //贴图动画
     this.actionSpeed = actionSpeed;
     this.actionStop = actionStop;
@@ -94,6 +93,16 @@ export class Block implements IBlock {
     this.gameObject.y = this.position.y;
     this.gameObject.scale = this.scale;
 
+    this.collisionBox = {
+      t:0,
+      b: 0,
+      l: 0,
+      r: 0,
+      m:{
+        x:0,
+        y:0
+      }
+    };
     this.blockTypes=[]
 
   }
@@ -110,11 +119,24 @@ export class Block implements IBlock {
     });
     this.position.x += this.speed.x;
     this.position.y += this.speed.y;
-    this.speed.x = this.speed.x;
     this.gameObject.x = this.position.x;
     this.gameObject.y = this.position.y;
     this.gameObject.scale = this.scale;
   }
+  updateCollisionBox=()=>{
+    this.collisionBox = {
+      t: Math.round(this.position.y - this.size.height)+2,
+      b: Math.round(this.position.y)-2 ,
+      l: Math.round(this.position.x - this.size.width / 2),
+      r: Math.round(this.position.x + this.size.width / 2),
+      m:{
+        x:Math.round(this.position.x),
+        y:Math.round(this.position.y - this.size.height/2)
+      }
+    }
+  }
+
+
   init() {
     characterAnimation({
       character: this.gameObject,
@@ -153,47 +175,6 @@ export class SpecialBlock extends Block implements ISpecialBlock {
       size,
       position
     })
-    this.position = {
-      x: position.x + size.width / 2,
-      y: GroundPosition.y - position.y,
-    };
-    this.size = size
-    this.speed = {
-      x: 0,
-      y: 0,
-    };
-    this.scale = {
-      x: 1,
-      y: 1,
-    };
-
-    //贴图动画
-    this.actionSpeed = actionSpeed;
-    this.actionStop = actionStop;
-    this.state = state;
-    this.gameObjectFrame = gameObjectFrame;
-    this.image = imageSrc;
-    this.gameTexture = PIXI.Texture.from(this.image);
-    this.count = 0;
-    this.direction = 0;
-    this.stop = 0;
-    this.fa = 0.5;
-    this.groundPosition = position.y;
-    this.wallJumpStart = false;
-    this.movingState = {
-      hitFace: { x: { left: 0, right: 0 }, y: { top: 0, bottom: 0 } },
-      stickFace: { left: 0, right: 0 },
-      wallJump: { left: 0, right: 0 },
-      shouldSpeed: { x: 0, y: 0 },
-      cross: { directionX: 0, directionY: 0 }
-    };
-    this.gameObject = new Sprite(this.gameTexture);
-    this.gameObject.anchor.y = 1;
-    this.gameObject.anchor.x = 0.5;
-    this.gameObject.x = this.position.x;
-    this.gameObject.y = this.position.y;
-    this.gameObject.scale = this.scale;
-
     this.blockTypes=[]
 
     this.special={
@@ -354,6 +335,7 @@ export class Player extends Block implements IPlayer {
         bottom: 0,
       }
     }
+    this.gameObject.rotation=-Math.PI/2
   }
   updateMovement(tick: number, state: string, collisionState: ICollisionState) {
     this.state = state;
@@ -373,18 +355,15 @@ export class Player extends Block implements IPlayer {
       hitFace: hitFace,
       shouldSpeed: shouldSpeed
     });
-
-    this.updateSpecialMovement(stickFace,hitFace,wallJump)
-    if (hitFace) {
-      if (hitFace.x.left) {
-        if (this.speed.x < 0) {
+    // this.updateSpecialMovement(stickFace,hitFace,wallJump)
+    this.updateHit2(hitFace)
+  }
+  updateHit=(hitFace:IHitFace)=>{
+      if (hitFace.x.left&&(this.speed.x < 0) ) {
           this.speed.x = 0;
-        }
       }
-      if (hitFace.x.right) {
-        if (this.speed.x > 0) {
+      if (hitFace.x.right&&(this.speed.x > 0) ) {
           this.speed.x = 0;
-        }
       }
       if (hitFace.y.bottom && !(this.speed.y < 0)) {
         this.speed.y = 0;
@@ -392,14 +371,29 @@ export class Player extends Block implements IPlayer {
       if (hitFace.y.top && !(this.speed.y > 0)) {
         this.speed.y = 0;
       }
-    }
   }
+  updateHit2=(hitFace:IHitFace)=>{
+    console.log(hitFace.y)
+    if (hitFace.x.left&&!(this.speed.y > 0) ) {
+        this.speed.y = 0;
+    }
+    if (hitFace.x.right&&!(this.speed.y < 0) ) {
+        this.speed.y = 0;
+    }
+    if (hitFace.y.bottom && (this.speed.x < 0)) {
+      this.speed.x = 0;
+    }
+    if (hitFace.y.top && (this.speed.x > 0)) {
+      this.speed.x = 0;
+    }
+}
   updateCross(cross: ICross, shouldSpeed: ISpeed) {
     if (cross.directionX) {
-      this.position.y -= 1
+      // this.position.y -= 1
+      this.speed.y=0
     }
     if(cross.directionY){
-      this.speed.x=0
+      this.position.x -= 1
     }
   }
   updateSpecialMovement(stickFace:any,hitFace:any,wallJump:any){
@@ -443,7 +437,47 @@ export class Player extends Block implements IPlayer {
       this.position.x+=max.speed.x
     }
   }
+  updateCollisionBox=()=>{
+    // this.collisionBox = {
+    //   t: Math.round(this.position.y - 60),
+    //   b: Math.round(this.position.y) ,
+    //   l: Math.round(this.position.x - 14),
+    //   r: Math.round(this.position.x + 14),
+    //   m:{
+    //     x:Math.round(this.position.x),
+    //     y:Math.round(this.position.y - 30)
+    //   }
+    // }
+    this.collisionBox = {
+      t: Math.round(this.position.y-14),
+      b: Math.round(this.position.y+14) ,
+      l: Math.round(this.position.x-60),
+      r: Math.round(this.position.x),
+      m:{
+        x:Math.round(this.position.x),
+        y:Math.round(this.position.y-14)
+      }
+    }
+  }
   updateRelativePosition() {
-    return this.position;
+    return {x:-this.gameObject.x+GroundPosition.x/2,
+      y:(-this.gameObject.y+GroundPosition.y/2)}
+  }
+  update(tick: number) {
+    this.count = characterAnimation({
+      character: this.gameObject,
+      characterTexture: this.gameTexture,
+      characterFrames: this.gameObjectFrame,
+      state: this.state,
+      count: this.count,
+      tick: tick,
+      characterActionspeed: this.actionSpeed,
+      animationStop: this.actionStop,
+    });
+    this.position.x += this.speed.y;
+    this.position.y -= this.speed.x;
+    this.gameObject.x = this.position.x;
+    this.gameObject.y = this.position.y;
+    this.gameObject.scale = this.scale;
   }
 }

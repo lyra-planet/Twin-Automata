@@ -21,7 +21,8 @@ export const NewtonLawsOfMotion = (
       }
     }
   }
-    if(!hitFace.y.bottom){
+  if(!hitFace.x.right){
       speed.y +=g / 2;
-    }
-};
+  }
+
+}

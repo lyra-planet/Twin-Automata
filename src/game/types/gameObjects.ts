@@ -1,6 +1,6 @@
 import { Sprite } from "pixi.js";
 import { blockTraceMovementObj } from "@game/action/blockMovementTrace";
-import { IPosition, IScale, ISpeed, TGameObjectTexture, ICollisionState, IGameObjectFrame, IHitFace, ICross, ISize, TSpecialMovement } from "@game/types/global";
+import { IPosition, IScale, ISpeed, TGameObjectTexture, ICollisionState, IGameObjectFrame, IHitFace, ICross, ISize, TSpecialMovement, TCollisionBox } from "@game/types/global";
 import { TBlockMoveMentTrace } from "./action";
 
 
@@ -20,6 +20,7 @@ export interface IBlock{
     fa: number;
     actionSpeed: number;
     actionStop: number;
+    collisionBox:TCollisionBox
     groundPosition: number;
     image: string;
     wallJumpStart:boolean;
@@ -28,6 +29,7 @@ export interface IBlock{
     blockTypes:TBlockType[]
     update:{(tick:number):void};
     init:{():Sprite};
+    updateCollisionBox:{():void}
 }
 export interface ISpecialBlock extends IBlock{
     special: { dash: boolean; dead: boolean; };
@@ -37,7 +39,6 @@ export interface ISpecialBlock extends IBlock{
         dead: boolean;
     }
 }
-
 
 export interface IMoveBlock extends IBlock{
     objectMovement: blockTraceMovementObj;

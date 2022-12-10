@@ -8,7 +8,6 @@ export const collisionBox_Block = ({
   isRightDown,
   isSpaceDown,}:CollisionBoxBlockInitData
     ) => {
-    const Round = Math.round
     let hitFace = {
       x:{left:0,right:0},y:{top:0,bottom:0}
     }
@@ -20,44 +19,31 @@ export const collisionBox_Block = ({
       left:0,
       right:0
     }
-    const gameObject1Box = {
-      top: Round(gameObject1.position.y - 60),
-      bottom: Round(gameObject1.position.y),
-      left: Round(gameObject1.position.x - 14),
-      right: Round(gameObject1.position.x + 14),
-      middle:{
-        x:Round(gameObject1.position.x),
-        y:Round(gameObject1.position.y - 30)
-      }
-    };
-    const gameObject2Box = {
-      top: Round(gameObject2.position.y - gameObject2.size.height)+2,
-      bottom: Round(gameObject2.position.y)-2 ,
-      left: Round(gameObject2.position.x - gameObject2.size.width / 2),
-      right: Round(gameObject2.position.x + gameObject2.size.width / 2),
-      middle:{
-        x:Round(gameObject2.position.x),
-        y:Round(gameObject2.position.y - gameObject2.size.height/2)
-      }
-    };
-    let collisionX = gameObject1Box.right> gameObject2Box.left&&
-    gameObject2Box.right > gameObject1Box.left
-    let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
-    gameObject2Box.top<gameObject1Box.bottom
-    let directionX = (gameObject1Box.middle.x>=gameObject2Box.middle.x?1:-1)
-    let directionY = (gameObject1Box.middle.y >=gameObject2Box.middle.y?1:-1)
-    if(collisionX){
+    gameObject1.updateCollisionBox()
+    gameObject2.updateCollisionBox()
+
+
+    let collisionX = gameObject1.collisionBox.r> gameObject2.collisionBox.l&&
+    gameObject2.collisionBox.r > gameObject1.collisionBox.l
+    let collisionY = gameObject1.collisionBox.t<gameObject2.collisionBox.b&&
+    gameObject2.collisionBox.t<gameObject1.collisionBox.b
+    let directionX = (gameObject1.collisionBox.m.x>=gameObject2.collisionBox.m.x?1:-1)
+    let directionY = (gameObject1.collisionBox.m.y >=gameObject2.collisionBox.m.y?1:-1)
+
+
+    const collisionUpdate1=()=>{
+      if(collisionX){
         if(directionY===1&&
-        gameObject2Box.bottom>=gameObject1Box.top+gameObject1.speed.y){
+        gameObject2.collisionBox.b>=gameObject1.collisionBox.t+gameObject1.speed.y){
         hitFace.y.top = 1  
         }else if((directionY===-1)&&
-        gameObject1Box.bottom+gameObject1.speed.y>=gameObject2Box.top
+        gameObject1.collisionBox.b+gameObject1.speed.y>=gameObject2.collisionBox.t
         ){
         hitFace.y.bottom = 1  
       }
     }else if(collisionY){     
       if(directionX===1&&
-        (gameObject1Box.left+gameObject1.speed.x<=gameObject2Box.right)){ 
+        (gameObject1.collisionBox.l+gameObject1.speed.x<=gameObject2.collisionBox.r)){ 
           if((!isRightDown)||(isLeftDown)||(gameObject1.speed.x<0)){hitFace.x.left = 1} 
           if(isLeftDown){
             stickFace.left=1
@@ -66,7 +52,7 @@ export const collisionBox_Block = ({
           }
           }
       }else if((directionX===-1)&&
-        (gameObject1Box.right+gameObject1.speed.x>=gameObject2Box.left)){
+        (gameObject1.collisionBox.r+gameObject1.speed.x>=gameObject2.collisionBox.l)){
           if((!isLeftDown)||(isRightDown)||(gameObject1.speed.x>0)){hitFace.x.right = 1} 
           if(isRightDown){
             stickFace.right=1
@@ -76,6 +62,42 @@ export const collisionBox_Block = ({
           }  
       } 
     } 
+    }
+
+    const collisionUpdate2=()=>{
+      if(collisionX){
+        if(directionY===1&&
+        gameObject1.collisionBox.t-gameObject1.speed.x<=gameObject2.collisionBox.b){
+          if((!isLeftDown)||(isRightDown)||(gameObject1.speed.x<0)){hitFace.y.top = 1} 
+          if(isRightDown){
+            stickFace.right=1
+            if(isSpaceDown){
+              wallJump.right = 1
+            }
+          }  
+        }else if((directionY===-1)&&
+        gameObject1.collisionBox.b-gameObject1.speed.x>=gameObject2.collisionBox.t
+        ){
+          if((!isRightDown)||(isLeftDown)||(gameObject1.speed.x>0)){hitFace.y.bottom = 1} 
+          if(isLeftDown){
+            stickFace.left=1
+          if(isSpaceDown){
+            wallJump.left = 1
+          }
+          }
+
+      }
+    }else if(collisionY){     
+      if(directionX===1&&
+        (gameObject1.collisionBox.l+gameObject1.speed.y<=gameObject2.collisionBox.r)){ 
+          hitFace.x.left = 1  
+      }else if((directionX===-1)&&
+        (gameObject1.collisionBox.r+gameObject1.speed.y>=gameObject2.collisionBox.l)){
+          hitFace.x.right = 1 
+      } 
+    } 
+    }
+    collisionUpdate2()
     let cross = {
       corssed:false,
       directionX:0,
@@ -101,7 +123,6 @@ export const collisionBox_MoveBlock = ({
     isRightDown,
     isSpaceDown}:CollisionBoxMoveBlockInitData
       ) => {
-      const Round = Math.round
       let hitFace = {
         x:{left:0,right:0},y:{top:0,bottom:0}
       }
@@ -120,37 +141,18 @@ export const collisionBox_MoveBlock = ({
         speed:{x:0,y:0},
         stand:0
       }
-
-      const gameObject1Box = {
-        top: Round(gameObject1.position.y - 58),
-        bottom: Round(gameObject1.position.y-2),
-        left: Round(gameObject1.position.x - 12),
-        right: Round(gameObject1.position.x + 12),
-        middle:{
-          x:Round(gameObject1.position.x),
-          y:Round(gameObject1.position.y - 30)
-        }
-      };
-      const gameObject2Box = {
-        top: Round(gameObject2.position.y - gameObject2.size.height)+2,
-        bottom: Round(gameObject2.position.y)-2 ,
-        left: Round(gameObject2.position.x - gameObject2.size.width / 2),
-        right: Round(gameObject2.position.x + gameObject2.size.width / 2),
-        middle:{
-          x:Round(gameObject2.position.x),
-          y:Round(gameObject2.position.y - gameObject2.size.height/2)
-        }
-      };
-      let collisionX = gameObject1Box.right> gameObject2Box.left&&
-      gameObject2Box.right > gameObject1Box.left
-      let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
-      gameObject2Box.top<gameObject1Box.bottom
+      gameObject1.updateCollisionBox()
+      gameObject2.updateCollisionBox()
+      let collisionX = gameObject1.collisionBox.r> gameObject2.collisionBox.l&&
+      gameObject2.collisionBox.r > gameObject1.collisionBox.l
+      let collisionY = gameObject1.collisionBox.t<gameObject2.collisionBox.b&&
+      gameObject2.collisionBox.t<gameObject1.collisionBox.b
   
-      let directionX = (gameObject1Box.middle.x>=gameObject2Box.middle.x?1:-1)
-      let directionY = (gameObject1Box.middle.y >=gameObject2Box.middle.y?1:-1)
+      let directionX = (gameObject1.collisionBox.m.x>=gameObject2.collisionBox.m.x?1:-1)
+      let directionY = (gameObject1.collisionBox.m.y >=gameObject2.collisionBox.m.y?1:-1)
       if(collisionX){ 
           if(directionY===1&&
-          gameObject2Box.bottom>=gameObject1Box.top+gameObject1.speed.y){
+          gameObject2.collisionBox.b>=gameObject1.collisionBox.t+gameObject1.speed.y){
           shouldY=true
           hitFace.y.top = 1  
           moveObject={
@@ -159,7 +161,7 @@ export const collisionBox_MoveBlock = ({
             stand:1
           }
           }else if((directionY===-1)&&
-          gameObject1Box.bottom+gameObject1.speed.y>=gameObject2Box.top
+          gameObject1.collisionBox.b+gameObject1.speed.y>=gameObject2.collisionBox.t
           ){
           shouldY=true
           hitFace.y.bottom = 1  
@@ -171,7 +173,7 @@ export const collisionBox_MoveBlock = ({
         }
       }else if(collisionY){   
         if(directionX===1&&
-          (gameObject1Box.left+gameObject1.speed.x<=gameObject2Box.right+gameObject2.speed.x)){ 
+          (gameObject1.collisionBox.l+gameObject1.speed.x<=gameObject2.collisionBox.r+gameObject2.speed.x)){ 
             shouldX=true
             moveObject={
               weight:1,
@@ -187,7 +189,7 @@ export const collisionBox_MoveBlock = ({
             }
             }
         }else if((directionX===-1)&&
-          (gameObject1Box.right+gameObject1.speed.x>=gameObject2Box.left+gameObject2.speed.x)){
+          (gameObject1.collisionBox.r+gameObject1.speed.x>=gameObject2.collisionBox.l+gameObject2.speed.x)){
             shouldX=true
             moveObject={
               weight:1,
@@ -236,31 +238,14 @@ export const collisionBox_TrapBlock = ({
   gameObject2,
 }:CollisionBoxTrapBlockInitData
     ) => {
-    const Round = Math.round
-    const gameObject1Box = {
-      top: Round(gameObject1.position.y - 60),
-      bottom: Round(gameObject1.position.y),
-      left: Round(gameObject1.position.x - 14),
-      right: Round(gameObject1.position.x + 14),
-      middle:{
-        x:Round(gameObject1.position.x),
-        y:Round(gameObject1.position.y - 30)
-      }
-    };
-    const gameObject2Box = {
-      top: Round(gameObject2.position.y - gameObject2.size.height)+2,
-      bottom: Round(gameObject2.position.y)-2 ,
-      left: Round(gameObject2.position.x - gameObject2.size.width / 2),
-      right: Round(gameObject2.position.x + gameObject2.size.width / 2),
-      middle:{
-        x:Round(gameObject2.position.x),
-        y:Round(gameObject2.position.y - gameObject2.size.height/2)
-      }
-    };
-    let collisionX = gameObject1Box.right> gameObject2Box.left&&
-    gameObject2Box.right > gameObject1Box.left
-    let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
-    gameObject2Box.top<gameObject1Box.bottom
+
+    gameObject1.updateCollisionBox()
+    gameObject2.updateCollisionBox()
+
+    let collisionX = gameObject1.collisionBox.r> gameObject2.collisionBox.l&&
+    gameObject2.collisionBox.r > gameObject1.collisionBox.l
+    let collisionY = gameObject1.collisionBox.t<gameObject2.collisionBox.b&&
+    gameObject2.collisionBox.t<gameObject1.collisionBox.b
     if(collisionX&&collisionY){
       console.log("Dead")
     }
@@ -271,39 +256,19 @@ export const collisionBox_DashBlock = ({
   gameObject2,
 }:CollisionBoxSpecialBlockInitData
     ) => {
-    const Round = Math.round
 
     let special={
       dash:false,
       dead:false
     }
 
+    gameObject1.updateCollisionBox()
+    gameObject2.updateCollisionBox()
 
-
-    const gameObject1Box = {
-      top: Round(gameObject1.position.y - 60),
-      bottom: Round(gameObject1.position.y),
-      left: Round(gameObject1.position.x - 14),
-      right: Round(gameObject1.position.x + 14),
-      middle:{
-        x:Round(gameObject1.position.x),
-        y:Round(gameObject1.position.y - 30)
-      }
-    };
-    const gameObject2Box = {
-      top: Round(gameObject2.position.y - gameObject2.size.height)+2,
-      bottom: Round(gameObject2.position.y)-2 ,
-      left: Round(gameObject2.position.x - gameObject2.size.width / 2),
-      right: Round(gameObject2.position.x + gameObject2.size.width / 2),
-      middle:{
-        x:Round(gameObject2.position.x),
-        y:Round(gameObject2.position.y - gameObject2.size.height/2)
-      }
-    };
-    let collisionX = gameObject1Box.right> gameObject2Box.left&&
-    gameObject2Box.right > gameObject1Box.left
-    let collisionY = gameObject1Box.top<gameObject2Box.bottom&&
-    gameObject2Box.top<gameObject1Box.bottom
+    let collisionX = gameObject1.collisionBox.r> gameObject2.collisionBox.l&&
+    gameObject2.collisionBox.r > gameObject1.collisionBox.l
+    let collisionY = gameObject1.collisionBox.t<gameObject2.collisionBox.b&&
+    gameObject2.collisionBox.t<gameObject1.collisionBox.b
 
     if(collisionX&&collisionY){
       special.dash=true
