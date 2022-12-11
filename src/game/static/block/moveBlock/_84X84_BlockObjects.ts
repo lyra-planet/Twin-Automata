@@ -11,12 +11,13 @@ import { blockTrace, upDownTrace } from "./trace";
 const blockObjectsList: number[][] = [
   [_84X84_BlockSize.width * -3, _84X84_BlockSize.height],[_84X84_BlockSize.width * -3, _84X84_BlockSize.height*2],[_84X84_BlockSize.width * -3, _84X84_BlockSize.height*3],
   [_84X84_BlockSize.width * -4, _84X84_BlockSize.height],
-  [_84X84_BlockSize.width * -5, _84X84_BlockSize.height]];
+  [_84X84_BlockSize.width * -5, _84X84_BlockSize.height],
+  [_84X84_BlockSize.width , _84X84_BlockSize.height*6]];
 
 export const _84X84_MoveBlockObjects = blockObjectsFunc(
   blockObjectsList,
   _84X84_MoveBlockPicture,
   _84X84_MoveBlockFrames,
   _84X84_BlockSize,
-  upDownTrace
+  blockTrace
 );

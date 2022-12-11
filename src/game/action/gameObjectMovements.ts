@@ -11,13 +11,33 @@ export const PlayerMovement = ({
     state:'stand',
     move:{x:0,y:0}
   }
-  if (!specialMovement.hit.r) {
+  /**----------------------
+   *    G R
+   *------------------------**/
+  let hitFoot = false
+  switch(playerObject.rotation){
+    case 0:
+    hitFoot=specialMovement.hit.b
+    break
+    case 1:
+      hitFoot=specialMovement.hit.r
+    break
+    case 2:
+      hitFoot=specialMovement.hit.t
+    break
+    case 3:
+      hitFoot=specialMovement.hit.l
+    break
+    default:console.log("ERROR")
+  }
+
+  if (!hitFoot) {
     isSpaceDown = false
     playerState.state = 'float'
-    if ((isLeftDown || isRightDown) && !playerObject.wallJumpStart) {
-      if (isLeftDown && playerObject.speed.x >= -3) {
+    if ((isLeftDown || isRightDown) ) {
+      if (isLeftDown && ((playerObject.speed.x >= -3 && !playerObject.wallJumpStart) || (playerObject.wallJumpStart&&playerObject.speed.x<=0))) {
         playerState.move.x=-1
-      } else if (isRightDown && playerObject.speed.x <= 3) {
+      } else if (isRightDown && ((playerObject.speed.x <= 3 && !playerObject.wallJumpStart) || (playerObject.wallJumpStart&&playerObject.speed.x>=0))) {
         playerState.move.x=1
       }
     }

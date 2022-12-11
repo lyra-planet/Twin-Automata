@@ -9,10 +9,10 @@ import { blockTrace } from "./trace";
 
 //1/4方块
 const blockObjectsList: number[][] = [
-  // [_21X42_BlockSize.width*10,_21X42_BlockSize.height*9],
-  // [_21X42_BlockSize.width*7,_21X42_BlockSize.height*7],
-  // [_21X42_BlockSize.width*3,_21X42_BlockSize.height*3],
-  // [_21X42_BlockSize.width*9,_21X42_BlockSize.height*3],
+  [_21X42_BlockSize.width*10,_21X42_BlockSize.height*9],
+  [_21X42_BlockSize.width*10,_21X42_BlockSize.height*10],
+
+
 ];
 
 export const _21X42_MoveBlockObjects = blockObjectsFunc(

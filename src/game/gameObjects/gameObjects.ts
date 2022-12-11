@@ -298,6 +298,7 @@ export class Player extends Block implements IPlayer {
       bottom: number;
     };
   }
+  rotation: number;
   constructor({
     imageSrc,
     gameObjectFrame,
@@ -319,6 +320,7 @@ export class Player extends Block implements IPlayer {
       size,
       position
     });
+    this.rotation=0
     this.groundPosition = GroundPosition.y - groundPosition;
     this.scale = {
       x: 2,
@@ -335,11 +337,10 @@ export class Player extends Block implements IPlayer {
         bottom: 0,
       }
     }
-    this.gameObject.rotation=-Math.PI/2
+    this.gameObject.rotation=-Math.PI/2*this.rotation
   }
   updateMovement(tick: number, state: string, collisionState: ICollisionState) {
     this.state = state;
-
     let hitFace = collisionState.hitFace;
     let stickFace = collisionState.stickFace;
     let wallJump = collisionState.wallJump;
@@ -353,54 +354,131 @@ export class Player extends Block implements IPlayer {
       stop: this.stop,
       groundPosition: this.groundPosition,
       hitFace: hitFace,
-      shouldSpeed: shouldSpeed
+      shouldSpeed: shouldSpeed,
+      rotation:this.rotation
     });
-    // this.updateSpecialMovement(stickFace,hitFace,wallJump)
-    this.updateHit2(hitFace)
+    this.updateSpecialMovement(stickFace,hitFace,wallJump)
+    this.updateHit(hitFace)
   }
   updateHit=(hitFace:IHitFace)=>{
-      if (hitFace.x.left&&(this.speed.x < 0) ) {
-          this.speed.x = 0;
+    let lr = 0 ,tb = 0
+    switch (this.rotation){
+      case 0:
+      lr=this.speed.x
+      tb=this.speed.y
+      break
+      case 1:
+        lr=this.speed.y
+        tb=-this.speed.x
+      break
+      case 2:
+      lr=-this.speed.x
+      tb=-this.speed.y
+      break
+      case 3:
+        lr=-this.speed.y
+        tb=this.speed.x
+      break
+      default: console.log("ERROR")
+    }
+    let x = false,y=false 
+      if (hitFace.x.left&&!(lr > 0) ) {
+          x=true
       }
-      if (hitFace.x.right&&(this.speed.x > 0) ) {
-          this.speed.x = 0;
+      if (hitFace.x.right&&!(lr < 0) ) {
+        x=true
       }
-      if (hitFace.y.bottom && !(this.speed.y < 0)) {
-        this.speed.y = 0;
+      if (hitFace.y.bottom && !(tb < 0)) {
+        y=true
       }
-      if (hitFace.y.top && !(this.speed.y > 0)) {
-        this.speed.y = 0;
+      if (hitFace.y.top && !(tb > 0)) {
+        y=true
+      }
+      switch (this.rotation){
+        case 0:
+        if(x)this.speed.x=0
+        if(y)this.speed.y=0
+        break
+        case 1:
+          if(y)this.speed.x=0
+          if(x)this.speed.y=0
+        break
+        case  2:
+          if(x)this.speed.x=0
+          if(y)this.speed.y=0
+          break
+        case 3:
+            if(y)this.speed.x=0
+            if(x)this.speed.y=0
+        break
+        default: console.log("ERROR")
       }
   }
-  updateHit2=(hitFace:IHitFace)=>{
-    console.log(hitFace.y)
-    if (hitFace.x.left&&!(this.speed.y > 0) ) {
-        this.speed.y = 0;
-    }
-    if (hitFace.x.right&&!(this.speed.y < 0) ) {
-        this.speed.y = 0;
-    }
-    if (hitFace.y.bottom && (this.speed.x < 0)) {
-      this.speed.x = 0;
-    }
-    if (hitFace.y.top && (this.speed.x > 0)) {
-      this.speed.x = 0;
-    }
-}
+/**----------------------
+ *    G R
+ *------------------------**/
   updateCross(cross: ICross, shouldSpeed: ISpeed) {
-    if (cross.directionX) {
-      // this.position.y -= 1
-      this.speed.y=0
-    }
-    if(cross.directionY){
-      this.position.x -= 1
+    switch (this.rotation){
+      case 0:
+        if (cross.directionX) {
+          this.position.y -= 1
+        }
+        if(cross.directionY){
+          this.speed.x = 0
+        }
+      break
+      case 1:
+        if (cross.directionX) {
+          this.speed.y=0
+        }
+        if(cross.directionY){
+          this.position.x -= 1
+        }
+      break
+      case 2:
+        if (cross.directionX) {
+          this.position.y += 1
+        }
+        if(cross.directionY){
+          this.speed.x = 0
+        }
+      break
+      case 3:
+        if (cross.directionX) {
+          this.speed.y=0
+        }
+        if(cross.directionY){
+          this.position.x += 1
+        }
+      break
+      default: console.log("ERROR")
     }
   }
   updateSpecialMovement(stickFace:any,hitFace:any,wallJump:any){
-    if (this.speed.x === 0) {
+    let canWallJump = false,hitFoot=false
+    switch (this.rotation){
+      case 0:
+        canWallJump = (this.speed.x === 0)
+        hitFoot = !hitFace.y.bottom
+      break
+      case 1:
+        canWallJump = (this.speed.y === 0)
+        hitFoot = !hitFace.x.right
+      break
+      case 2:
+        canWallJump = (this.speed.x === 0)
+        hitFoot = !hitFace.y.top
+      break
+      case 3:
+        canWallJump = (this.speed.y === 0)
+        hitFoot = !hitFace.x.left 
+      break
+      default: console.log("ERROR")
+    }
+    if (canWallJump) {
       this.wallJumpStart = false;
     }
-    if ((stickFace.left || stickFace.right) && !hitFace.y.bottom) {
+    if ((stickFace.left || stickFace.right) && hitFoot) {
       if (wallJump.left) {
         this.speed.x = 4;
         this.speed.y = -4;
@@ -428,36 +506,89 @@ export class Player extends Block implements IPlayer {
               max = item
           }
     }) 
+
     if(max.stand>0){
       this.position.x+=max.speed.x
       this.position.y+=max.speed.y
     }else 
     if (max.weight>0) {
-      console.log(max.weight)
-      this.position.x+=max.speed.x
+      switch (this.rotation){
+        case 0:
+          this.position.x+=max.speed.x
+        break
+        case 1:
+          this.position.y+=max.speed.y
+        break
+        case 2:
+          this.position.x+=max.speed.x
+        break
+        case 3:
+          this.position.y+=max.speed.y
+        break
+        default: console.log("ERROR")
+      }
+      
     }
   }
   updateCollisionBox=()=>{
-    // this.collisionBox = {
-    //   t: Math.round(this.position.y - 60),
-    //   b: Math.round(this.position.y) ,
-    //   l: Math.round(this.position.x - 14),
-    //   r: Math.round(this.position.x + 14),
-    //   m:{
-    //     x:Math.round(this.position.x),
-    //     y:Math.round(this.position.y - 30)
-    //   }
-    // }
-    this.collisionBox = {
-      t: Math.round(this.position.y-14),
-      b: Math.round(this.position.y+14) ,
-      l: Math.round(this.position.x-60),
-      r: Math.round(this.position.x),
-      m:{
+    /**----------------------
+     *    G R
+     *------------------------**/
+    switch (this.rotation){
+      case 0:
+        this.collisionBox = {
+          t: Math.round(this.position.y - 60),
+          b: Math.round(this.position.y) ,
+          l: Math.round(this.position.x - 14),
+          r: Math.round(this.position.x + 14),
+          m:{
+            x:Math.round(this.position.x),
+            y:Math.round(this.position.y - 30)
+          }
+        }
+      break
+      case 1:
+        this.collisionBox = {
+        t: Math.round(this.position.y-14),
+        b: Math.round(this.position.y+14) ,
+        l: Math.round(this.position.x-60),
+        r: Math.round(this.position.x),
+        m:{
         x:Math.round(this.position.x),
         y:Math.round(this.position.y-14)
-      }
+        }
+        }
+      break
+      case 2:
+        this.collisionBox = {
+          t: Math.round(this.position.y),
+          b: Math.round(this.position.y+60) ,
+          l: Math.round(this.position.x - 14),
+          r: Math.round(this.position.x + 14),
+          m:{
+            x:Math.round(this.position.x),
+            y:Math.round(this.position.y - 30)
+          }
+        }
+      break
+      case 3:
+        this.collisionBox = {
+          t: Math.round(this.position.y-14),
+          b: Math.round(this.position.y+14) ,
+          l: Math.round(this.position.x),
+          r: Math.round(this.position.x+60),
+          m:{
+            x:Math.round(this.position.x),
+            y:Math.round(this.position.y-14)
+          }
+          }
+      break
+      default: console.log("ERROR")
     }
+  }
+
+  updateRotation: (rotation: number) => void=(rotation:number)=>{
+      this.rotation=rotation
   }
   updateRelativePosition() {
     return {x:-this.gameObject.x+GroundPosition.x/2,
@@ -474,10 +605,32 @@ export class Player extends Block implements IPlayer {
       characterActionspeed: this.actionSpeed,
       animationStop: this.actionStop,
     });
-    this.position.x += this.speed.y;
-    this.position.y -= this.speed.x;
+    /**----------------------
+     *    GR
+     *------------------------**/
+    switch (this.rotation){
+      case 0:
+        this.position.x += this.speed.x;
+        this.position.y += this.speed.y;
+      break
+      case 1:
+        this.position.x += this.speed.y;
+        this.position.y -= this.speed.x;
+      break
+      case 2:
+        this.position.x -= this.speed.x;
+        this.position.y -= this.speed.y;
+      break
+      case 3:
+        this.position.x -= this.speed.y;
+        this.position.y += this.speed.x;
+      break
+      default: console.log("ERROR")
+    }
+
     this.gameObject.x = this.position.x;
     this.gameObject.y = this.position.y;
     this.gameObject.scale = this.scale;
+    this.gameObject.rotation=-Math.PI/2*this.rotation
   }
 }

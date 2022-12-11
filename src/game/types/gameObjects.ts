@@ -48,9 +48,11 @@ export interface IMoveBlock extends IBlock{
 }
 export interface IPlayer extends IBlock{
     hitFace: IHitFace
+    rotation:number
     updateMovement:{(tick: number, state: string, collisionState: ICollisionState,specialMovement:TSpecialMovement):void};
     updateCross:{(cross:ICross,shouldSpeed:ISpeed):void}
     updateRelativePosition:{():IPosition}
+    updateRotation:{(rotation:number):void}
 }
 export interface BlockInitData {
     imageSrc: string;

@@ -80,7 +80,7 @@ export class Game{
     this.framesThisSecond = 0
     this.lastFpsUpdate = 0
     this.delta = 0
-    this.rotation=1
+    this.rotation=0
   }
   init(){
     const loader = new PIXI.Loader();
@@ -131,7 +131,8 @@ export class Game{
     requestAnimationFrame(this.gameLoop);
   }
   update = () => {
-    this.tick += 1    
+    this.tick += 1  
+    adventurerObject.updateRotation(this.rotation)  
     const state = this.movementUpdate()
     this.collisionUpdate(this.tick, state)
 
@@ -141,6 +142,9 @@ export class Game{
     this.cameraMoveFollow(this.tick)
   }
   movementUpdate=()=>{
+    /**----------------------
+     *    G R
+     *------------------------**/
     this.specialMovementUpdate()
     const moveState = PlayerMovement({
       playerObject: adventurerObject,
@@ -154,8 +158,12 @@ export class Game{
     const state = moveState.state
     return state
   }
+
+/**----------------------
+ *        G R
+ *------------------------**/
   specialMovementUpdate=()=>{
-    const {hitFace,stickFace,wallJump} = this.finallCollisionState
+    const {hitFace} = this.finallCollisionState
     if(hitFace.y.top!==0){
       this.specialMovement.hit.t=true
     }else{
@@ -163,7 +171,6 @@ export class Game{
     }    
     if(hitFace.y.bottom!==0){
       this.specialMovement.hit.b=true
-      this.specialMovement.dash=true
     }else{
       this.specialMovement.hit.b=false
     }
@@ -177,6 +184,29 @@ export class Game{
     }else{
       this.specialMovement.hit.r=false
     }     
+    switch (this.rotation){
+      case 0:
+        if(hitFace.y.bottom!==0){
+          this.specialMovement.dash=true
+        } 
+        break
+      case 1:
+        if(hitFace.x.right!==0){
+          this.specialMovement.dash=true
+        } 
+        break
+      case 2:
+        if(hitFace.y.top!==0){
+          this.specialMovement.dash=true
+        } 
+        break
+      case 3:
+        if(hitFace.x.left!==0){
+          this.specialMovement.dash=true
+        } 
+        break
+      default: console.log("ERROR")
+    }
   }
   collisionUpdate = (tick: number, state: string) => {
     if(!this.moveBlockLists||!this.blockLists||!this.moveBlockLists||!this.trapBlockLists){
@@ -208,6 +238,9 @@ export class Game{
     )
     //随平台移动
     const moveObjects = this.moveBlockLists.moveObjects
+    /**----------------------
+     *    G R
+     *------------------------**/
     adventurerObject.updateMoveObject(moveObjects)
     
     //碰撞检测
@@ -226,12 +259,12 @@ export class Game{
       this.finallCollisionState.cross.directionX += item.cross.directionX
       this.finallCollisionState.cross.directionY += item.cross.directionY
     })
-
     adventurerObject.updateMovement(tick, state, this.finallCollisionState)
     //穿模修正
     adventurerObject.updateCross(this.finallCollisionState.cross, this.finallCollisionState.shouldSpeed)
 
   }
+
   objectsUpdate=(tick:number)=>{
     if(!this.moveBlockLists||!this.blockLists||!this.moveBlockLists||!this.trapBlockLists){
       return
@@ -242,6 +275,7 @@ export class Game{
     this.trapBlockLists.update(tick)
     this.dashBlockLists?.update(tick)
   }
+
   specialUpdate = ()=>{
     
     const _special= [this.dashBlockLists?.special]
@@ -258,6 +292,7 @@ export class Game{
       this.specialMovement.dash=true
     }
   }
+
   control = () => {
     let left = keyboard(37),
       right = keyboard(39),

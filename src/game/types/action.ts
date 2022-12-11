@@ -1,6 +1,6 @@
 import { Sprite,Texture,Resource } from "pixi.js";
 import { IBlock, IMoveBlock, IPlayer, ISpecialBlock } from "@game/types/gameObjects";
-import { TSpecialMovement } from "./global";
+import { IHitFace, IPosition, ISpeed, TSpecialMovement } from "./global";
 
 export interface PlayerMovementData {
     playerObject: IPlayer,
@@ -12,14 +12,15 @@ export interface PlayerMovementData {
 }
 
 export interface NewtonLawsOfMotionData {
-    position: { x: number; y: number; };
-    speed: { x: number; y: number; };
+    position:IPosition;
+    speed: ISpeed;
     fa: number;
     direction: number;
     stop: number;
     groundPosition: number;
-    hitFace: { x: { left: number; right: number; }; y: { top: number; bottom: number; }; };
-    shouldSpeed: { x: number; y: number; }
+    hitFace:IHitFace;
+    shouldSpeed: ISpeed;
+    rotation:number
 }
 export interface CollisionBoxBlockInitData {
     gameObject1: IPlayer,

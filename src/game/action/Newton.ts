@@ -2,7 +2,7 @@ import { NewtonLawsOfMotionData } from '@game/types/action';
 
 export const NewtonLawsOfMotion = (
   {
-    speed,fa, direction, stop,hitFace
+    speed,fa, direction, stop,hitFace,rotation
   }:NewtonLawsOfMotionData
   ) => {
     let g=0.2
@@ -21,8 +21,31 @@ export const NewtonLawsOfMotion = (
       }
     }
   }
-  if(!hitFace.x.right){
-      speed.y +=g / 2;
-  }
+  /**----------------------
+   *    G R
+   *------------------------**/
 
+  switch(rotation){
+    case 0 :
+      if(!hitFace.y.bottom){
+        speed.y +=g / 2;
+      }
+    break
+    case 1 :
+      if(!hitFace.x.right){
+        speed.y +=g / 2;
+      }
+    break
+    case 2 :
+      if(!hitFace.y.top){
+        speed.y +=g / 2;
+      }
+    break
+    case 3 :
+      if(!hitFace.x.left){
+        speed.y +=g / 2;
+      }
+    break
+    default:console.log("ERROR")
+  }
 }
